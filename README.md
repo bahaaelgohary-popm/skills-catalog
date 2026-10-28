@@ -59,7 +59,7 @@ Catalog metadata lives in `catalog.yaml`, not in `SKILL.md` frontmatter, so `cla
 3. **Merge.** After the checks pass, `.github/workflows/auto-merge.yml` squash-merges the PR without a person if it only adds one new Experimental plugin (its folder plus one `marketplace.json` entry) and bundles no code ("Instructions only", or "Pre-approved tools" limited to the read-only `Read`, `Grep` and `Glob`). Anything else, such as skills with scripts, hooks or MCP servers, skills that pre-approve other tools (they run without asking), edits to existing skills, or changes outside `plugins/`, waits for a reviewer. Add the `hold` label to a PR to keep it open. The rules are in `scripts/auto-merge-check.mjs`; dry-run them with `node scripts/auto-merge-check.mjs --repo <owner/name> --pr <n>`.
 4. **Catalog updates.** On `main`, the same Action regenerates `catalog.json` (including each plugin's last commit date) and redeploys the page. Users get the new plugin with `claude plugin marketplace update skills-catalog`.
 
-From a terminal without Claude Code, one command does all of it: `node scripts/new-plugin.mjs --from <skill-folder> --owner "Your Name" --jobs plan --works-with chat --pr`. See [Publishing a skill manually](docs/publishing-manually.md).
+From a terminal without Claude Code, one command does all of it: `node scripts/new-plugin.mjs --from <skill-folder> --owner "Your Name" --jobs plan --works-with chat --pr`. To update a published skill, `node scripts/new-plugin.mjs --from <skill-folder> --update` raises its version and opens the PR. See [Publishing a skill manually](docs/publishing-manually.md).
 
 ## Run the checks locally
 

@@ -192,6 +192,17 @@ export async function openPullRequestAdding({ api, repo, name, exclude, before }
   return null;
 }
 
+// Finds an open pull request that changes any file under plugins/<name>/ (for updates to an existing plugin).
+export async function openPullRequestChanging({ api, repo, name }) {
+  const list = await api('GET', `/repos/${repo}/pulls?state=open&sort=created&direction=asc&per_page=100`);
+  if (list.status >= 300) throw new Error(`Listing open pull requests failed (HTTP ${list.status})`);
+  for (const pr of list.data) {
+    const files = await api('GET', `/repos/${repo}/pulls/${pr.number}/files?per_page=100`);
+    if (files.status < 300 && files.data.some(f => f.filename.startsWith(`plugins/${name}/`))) return { number: pr.number, url: pr.html_url };
+  }
+  return null;
+}
+
 // Opens a pull request with the plugin through the GitHub REST API.
 // api(method, path, body) must resolve to { status, data }; the browser passes a fetch wrapper, tests pass `gh api`.
 // baseBranch defaults to the repository's default branch.

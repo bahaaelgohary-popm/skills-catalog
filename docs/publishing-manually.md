@@ -73,7 +73,15 @@ Run it as `/my-skill:my-skill`; plugin skills always carry the `plugin:skill` pr
 
 ## Updating a published skill
 
-Branch from `main`, edit the files under `plugins/my-skill/`, and **bump `version` in `.claude-plugin/plugin.json`** (for example `0.1.0` → `0.2.0`). Installed copies stay on their version until it changes, so CI fails an edit that doesn't raise it (changes to `catalog.yaml` alone don't need a bump). Then commit and open a PR with `gh pr create`. Edits to existing skills always go to a reviewer. To promote a skill, change `tier: Experimental` to `Recommended` in its `catalog.yaml`.
+Edit your local skill folder, then run one command from the clone:
+
+```bash
+node scripts/new-plugin.mjs --from ~/.claude/skills/my-skill --update
+```
+
+It replaces the files in `plugins/my-skill/skills/my-skill/`, raises the patch version (`--version 0.2.0` for a bigger step), keeps `catalog.yaml` and the catalog description (`--description "..."` to change it), runs the checks and opens a PR on `update-skill/my-skill`. It stops if another open PR already changes that skill. `/publish-skill` does the same when the skill already exists.
+
+To do it by hand: branch from `main`, edit the files under `plugins/my-skill/`, and **bump `version` in `.claude-plugin/plugin.json`** (for example `0.1.0` → `0.2.0`). Installed copies stay on their version until it changes, so CI fails an edit that doesn't raise it (changes to `catalog.yaml` alone don't need a bump). Then commit and open a PR with `gh pr create`. Edits to existing skills always go to a reviewer. To promote a skill, change `tier: Experimental` to `Recommended` in its `catalog.yaml`.
 
 ## What the script writes
 
@@ -110,5 +118,6 @@ Then add `{"name": "my-skill", "source": "./plugins/my-skill", "description": ".
 | `Invalid JSON syntax` | Usually a missing or extra comma in `marketplace.json` |
 | `The checkout has uncommitted changes` | Commit or stash them, or use a fresh clone |
 | `Could not create branch add-skill/x` | A branch with that name exists; delete it or pass `--name` |
+| `Pull request #n … already changes plugins/x` | Finish or close that PR before starting another update |
 | `"x" is already proposed in pull request #n` | Someone already opened a PR for that name; update that PR, or pick another name with `--name` |
 | Gitleaks finding | Remove the secret, rotate it, and run again |
