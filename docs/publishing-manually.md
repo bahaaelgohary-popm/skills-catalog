@@ -110,4 +110,5 @@ Then add `{"name": "my-skill", "source": "./plugins/my-skill", "description": ".
 | `Invalid JSON syntax` | Usually a missing or extra comma in `marketplace.json` |
 | `The checkout has uncommitted changes` | Commit or stash them, or use a fresh clone |
 | `Could not create branch add-skill/x` | A branch with that name exists; delete it or pass `--name` |
+| `"x" is already proposed in pull request #n` | Someone already opened a PR for that name; update that PR, or pick another name with `--name` |
 | Gitleaks finding | Remove the secret, rotate it, and run again |
