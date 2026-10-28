@@ -48,3 +48,7 @@ Overall: Healthy | Needs attention | At risk
 Rules:
 - Never delete branches, files or history yourself. Suggest the commands and let the user run them.
 - Keep "Fix first" to three items at most.
+
+## Test note
+
+End-to-end test of the update command; this PR is closed without merging.
