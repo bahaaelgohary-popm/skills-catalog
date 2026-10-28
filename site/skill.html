@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Skill · Skills Catalog</title>
+<title>Skill · Skills Marketplace</title>
 <meta name="description" content="A Claude Code skill in the catalog: what it does, what it can do, its files and history.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -93,6 +93,15 @@
   .history .s { color: var(--text-primary); overflow-wrap: anywhere; }
   .history .m { color: var(--text-faint); font-size: 12px; }
   .history .m a { color: var(--text-muted); font-family: var(--font-mono); }
+  .tags a.job { padding: 0 6px; border: 1px solid var(--border); border-radius: var(--radius-badge); background: var(--bg-card); color: var(--text-secondary); font-size: 12px; text-decoration: none; }
+  .tags a.job:hover { border-color: var(--border-inactive); color: var(--text-primary); }
+  .type-icon { display: inline-block; width: 9px; height: 9px; margin-right: 8px; vertical-align: 0; }
+  .t-Skill { background: var(--success); border-radius: 2px; }
+  .t-Agent { background: var(--alert); border-radius: 50%; }
+  .t-Plugin { background: var(--text-primary); transform: rotate(45deg) scale(0.85); }
+  .notice { margin: -12px 0 24px; padding: 10px 14px; border: 1px solid var(--alert); border-radius: var(--radius-control); background: var(--bg-card); color: var(--alert); font-size: 13px; }
+  .notice a { color: var(--alert); }
+  .notice-stale { border-color: var(--experimental-border); background: var(--warning-bg); color: var(--warning); }
   .tier-note { margin: 0; color: var(--text-secondary); font-size: 13px; }
   .tier-note p { margin: 0 0 8px; }
   .tier-note p:last-child { margin: 0; }
@@ -112,7 +121,7 @@
 </head>
 <body>
 <div class="wrap">
-  <a class="back" href="./">← Skills Catalog</a>
+  <a class="back" href="./">← Skills Marketplace</a>
   <main id="main"><p class="state">Loading…</p></main>
 </div>
 
@@ -137,7 +146,7 @@
   function render(catalog) {
     const p = plugin;
     const cap = p.capabilities || { level: 'instructions', label: 'Instructions only', summary: '', items: [], skills: [] };
-    document.title = `${p.name} · Skills Catalog`;
+    document.title = `${p.name} · Skills Marketplace`;
     const skills = cap.skills || [];
     const invocations = skills.length ? `Type ${skills.map(s => `<code>${esc(s.invocation)}</code>`).join(', ')}${skills.every(s => s.manualOnly)
       ? '. It runs only when you call it.'
@@ -151,6 +160,8 @@
         <span class="cap cap-${esc(cap.level)}" title="${esc(cap.summary)}">${esc(cap.label)}</span>
       </div>
       <p class="lead">${esc(p.description)}</p>
+      ${p.deprecated ? `<p class="notice">This item is deprecated and no longer maintained.${p.replacedBy ? ` Use <a href="skill.html?name=${encodeURIComponent(p.replacedBy)}" class="mono">${esc(p.replacedBy)}</a> instead.` : ''}</p>`
+        : p.stale ? `<p class="notice notice-stale">Not updated in over ${esc(catalog.staleDays || 90)} days. It may still work, but check it before relying on it.</p>` : ''}
 
       <div class="layout">
         <div class="col">
@@ -193,7 +204,10 @@
           <section class="panel" aria-labelledby="h-details">
             <h2 id="h-details">Details</h2>
             <dl class="meta">
+              <dt>Type</dt><dd><span class="type-icon t-${esc(p.type)}"></span>${esc(p.type || '—')}</dd>
               <dt>Owner</dt><dd>${esc(p.owner)}</dd>
+              <dt>Helps with</dt><dd><div class="tags">${(p.jobs || []).map(j => `<a class="job" href="./?job=${encodeURIComponent(j)}#browse">${esc(catalog.jobs?.find(x => x.id === j)?.label || j)}</a>`).join('') || '—'}</div></dd>
+              <dt>Works with</dt><dd><div class="tags">${(p.worksWith || []).map(w => `<span>${esc(catalog.worksWith?.find(x => x.id === w)?.label || w)}</span>`).join('') || '—'}</div></dd>
               <dt>Version</dt><dd class="mono">${esc(p.version || '—')}</dd>
               <dt>Updated</dt><dd>${esc(fmtDate(p.lastUpdated))}</dd>
               <dt>Tags</dt><dd><div class="tags">${(p.tags || []).map(t => `<span>${esc(t)}</span>`).join('') || '—'}</div></dd>
@@ -273,7 +287,7 @@
       repo = catalog.repo;
       plugin = catalog.plugins.find(p => p.name === name);
       if (!plugin) {
-        main.innerHTML = `<p class="state">No skill named <span class="mono">${esc(name || '(none)')}</span> in the catalog. <a href="./">Browse all skills</a>.</p>`;
+        main.innerHTML = `<p class="state">No skill named <span class="mono">${esc(name || '(none)')}</span> in the marketplace. <a href="./">Browse all</a>.</p>`;
         return;
       }
       render(catalog);

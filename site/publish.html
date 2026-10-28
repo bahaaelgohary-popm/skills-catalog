@@ -148,6 +148,13 @@
   .field label, .field .label { color: var(--text-muted); font-size: 12px; font-weight: 500; }
   .field output { min-height: 22px; color: var(--text-primary); overflow-wrap: anywhere; }
   .field output.empty { color: var(--text-faint); }
+  .choices-field { margin: 0; padding: 0; border: 0; }
+  .choices-field legend { margin-bottom: 6px; padding: 0; }
+  .choices { display: flex; flex-wrap: wrap; gap: 6px; }
+  .choice { display: inline-flex; align-items: center; gap: 6px; padding: 4px 10px; border: 1px solid var(--border-inactive); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text-secondary); font-size: 13px; cursor: pointer; }
+  .choice:hover { background: var(--bg-subtle-hover); }
+  .choice input { margin: 0; accent-color: var(--accent-strong); }
+  .choice:has(input:checked) { border-color: var(--accent-soft-border); background: var(--accent-soft-bg); color: var(--text-primary); }
   .badge { display: inline-block; padding: 1px 7px; border: 1px solid; border-radius: var(--radius-badge); font-size: 12px; font-weight: 600; }
   .badge-Experimental { color: var(--experimental-text); background: var(--experimental-bg); border-color: var(--experimental-border); }
   .tier-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px; }
@@ -200,9 +207,9 @@
 </head>
 <body>
 <div class="wrap">
-  <a class="back" href="./">← Skills Catalog</a>
+  <a class="back" href="./">← Skills Marketplace</a>
   <h1>Publish a skill</h1>
-  <p class="lead">Every way of publishing opens a pull request. Checks run on it, a reviewer merges it, and the skill appears in the catalog as <strong>Experimental</strong>.</p>
+  <p class="lead">Every way of publishing opens a pull request. Checks run on it, a reviewer merges it, and the skill appears in the marketplace as <strong>Experimental</strong>.</p>
 
   <section class="panel" aria-labelledby="gh-title">
     <div class="gh-row">
@@ -278,6 +285,8 @@
           <div class="field"><label for="in-owner">Owner</label><input type="text" id="in-owner" placeholder="Person or team"></div>
           <div class="field"><label for="in-tags">Tags</label><input type="text" id="in-tags" placeholder="comma, separated"></div>
           <div class="field full"><label for="in-use">Use it when</label><input type="text" id="in-use" placeholder="One line on when to reach for this skill"></div>
+          <fieldset class="field full choices-field"><legend class="label">Helps with (“I want to…” on the marketplace)</legend><div class="choices" id="in-jobs"></div></fieldset>
+          <fieldset class="field full choices-field"><legend class="label">Works with</legend><div class="choices" id="in-works"></div></fieldset>
         </div>
       </section>
     </div>
@@ -449,6 +458,16 @@ async function takeFiles(list) {
 window.__takeFiles = takeFiles;
 
 // ---- Details ----
+// Checkbox groups for the controlled vocabularies; selections are remembered like the text fields.
+function renderChoices(id, list) {
+  const saved = (() => { try { return JSON.parse(store.get('localStorage', `publish-${id}`) || '[]'); } catch { return []; } })();
+  $(id).innerHTML = list.map(x => `<label class="choice"><input type="checkbox" value="${esc(x.id)}"${saved.includes(x.id) ? ' checked' : ''}>${esc(x.label)}</label>`).join('');
+  $(id).addEventListener('change', () => { store.set('localStorage', `publish-${id}`, JSON.stringify(checked(id))); refresh(); });
+}
+const checked = (id) => [...$(id).querySelectorAll('input:checked')].map(i => i.value);
+renderChoices('in-jobs', core.JOBS);
+renderChoices('in-works', core.WORKS_WITH);
+
 for (const id of ['in-owner', 'in-tags', 'in-use']) {
   const el = $(id);
   el.value = store.get('localStorage', `publish-${id}`) || '';
@@ -465,6 +484,8 @@ function currentPlugin() {
     owner: $('in-owner').value.trim(),
     tags: core.tagsFrom($('in-tags').value),
     useItWhen: $('in-use').value.trim(),
+    jobs: checked('in-jobs'),
+    worksWith: checked('in-works'),
     files,
   };
 }
@@ -525,7 +546,7 @@ $('publish').addEventListener('click', async () => {
     state.existing.push(plugin.name);
     showResult(true, `<strong>Pull request <a href="${esc(pr.url)}" target="_blank" rel="noopener">#${pr.number}</a> is open.</strong>
       <ol><li>Checks run on it (validation, catalog rules, secret scan).</li><li>A reviewer merges it.</li><li>The catalog page updates within a couple of minutes.</li></ol>
-      <p><a href="./#in-review">See it under “In review” in the catalog →</a></p>`);
+      <p><a href="./#in-review">See it under “In review” in the marketplace →</a></p>`);
     if (state.mode === 'write') store.set('localStorage', 'publish-draft', null);
   } catch (err) {
     showResult(false, `Publishing failed: ${esc(err.message)}`);

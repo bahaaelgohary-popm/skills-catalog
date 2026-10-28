@@ -2,7 +2,27 @@
 // No dependencies. Files are { path, bytes: Uint8Array } throughout.
 
 export const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
+export const TIERS = ['Experimental', 'Recommended'];
 export const NEW_TIER = 'Experimental';
+
+// Controlled vocabularies for catalog.yaml, so landing-page chips and filters stay tidy.
+// jobs: what a skill helps you do ("I want to…"). works_with: what it reads or acts on.
+export const JOBS = [
+  { id: 'plan', label: 'Plan and spec work' },
+  { id: 'review', label: 'Review code' },
+  { id: 'ship', label: 'Ship a release' },
+  { id: 'meetings', label: 'Run meetings and standups' },
+  { id: 'incidents', label: 'Handle an incident' },
+  { id: 'maintain', label: 'Keep a repo healthy' },
+  { id: 'share', label: 'Share a skill' },
+];
+export const WORKS_WITH = [
+  { id: 'chat', label: 'Chat only' },
+  { id: 'files', label: 'Local files' },
+  { id: 'git', label: 'Git' },
+  { id: 'github', label: 'GitHub' },
+  { id: 'terminal', label: 'Terminal' },
+];
 export const LIMITS = { maxFiles: 100, maxFileBytes: 1024 * 1024, maxTotalBytes: 5 * 1024 * 1024 };
 
 const JUNK = /(^|\/)(__MACOSX|\.DS_Store|Thumbs\.db|desktop\.ini|\.git)(\/|$)/;
@@ -87,7 +107,7 @@ export function normalizeUpload(entries) {
 }
 
 // Pre-publish checks. Returns [{ ok, label, detail }]; publishing is allowed only when all are ok.
-export function runChecks({ name, description, owner, useItWhen, files, existingNames = [] }) {
+export function runChecks({ name, description, owner, useItWhen, jobs = [], worksWith = [], files, existingNames = [] }) {
   const out = [];
   const add = (ok, label, detail = '') => out.push({ ok, label, detail });
   const skill = files.find(f => f.path === 'SKILL.md');
@@ -102,6 +122,10 @@ export function runChecks({ name, description, owner, useItWhen, files, existing
   add(!placeholder && name !== 'my-skill', 'Template placeholders replaced', placeholder ? `Still has "${placeholder[0]}"` : name === 'my-skill' ? 'Rename my-skill' : '');
   add(!!owner?.trim(), 'Owner is set');
   add(!!useItWhen?.trim(), '"Use it when" is set');
+  const badJob = jobs.find(j => !JOBS.some(x => x.id === j));
+  add(jobs.length > 0 && !badJob, 'At least one "I want to…" job', badJob ? `Unknown job "${badJob}"` : jobs.length ? '' : 'Pick what it helps with');
+  const badTool = worksWith.find(w => !WORKS_WITH.some(x => x.id === w));
+  add(worksWith.length > 0 && !badTool, '"Works with" is set', badTool ? `Unknown value "${badTool}"` : worksWith.length ? '' : 'Pick what it works with');
 
   const total = files.reduce((n, f) => n + f.bytes.length, 0);
   const big = files.find(f => f.bytes.length > LIMITS.maxFileBytes);
@@ -124,17 +148,17 @@ export function pluginJson({ name, description, owner, tags }) {
   return JSON.stringify({ name, version: '0.1.0', description, author: { name: owner }, license: 'MIT', keywords: tags }, null, 2) + '\n';
 }
 
-export function catalogYaml({ owner, tags, useItWhen }) {
+export function catalogYaml({ owner, tags, useItWhen, jobs = [], worksWith = [] }) {
   const q = (s) => JSON.stringify(s);
-  return `owner: ${q(owner)}\ntier: ${NEW_TIER}\ntags: [${tags.join(', ')}]\nuse_it_when: ${q(useItWhen)}\n`;
+  return `owner: ${q(owner)}\ntier: ${NEW_TIER}\ntags: [${tags.join(', ')}]\njobs: [${jobs.join(', ')}]\nworks_with: [${worksWith.join(', ')}]\nuse_it_when: ${q(useItWhen)}\n`;
 }
 
 // The full plugin, as repository paths under plugins/<name>/.
-export function buildPluginFiles({ name, description, owner, tags = [], useItWhen, files }) {
+export function buildPluginFiles({ name, description, owner, tags = [], useItWhen, jobs = [], worksWith = [], files }) {
   const base = `plugins/${name}`;
   return [
     { path: `${base}/.claude-plugin/plugin.json`, bytes: textToBytes(pluginJson({ name, description, owner, tags })) },
-    { path: `${base}/catalog.yaml`, bytes: textToBytes(catalogYaml({ owner, tags, useItWhen })) },
+    { path: `${base}/catalog.yaml`, bytes: textToBytes(catalogYaml({ owner, tags, useItWhen, jobs, worksWith })) },
     ...files.map(f => ({ path: `${base}/skills/${name}/${f.path}`, bytes: f.bytes })),
   ];
 }
@@ -201,6 +225,8 @@ export async function publishToGitHub({ api, repo, plugin, via, baseBranch, onSt
       `- **Owner:** ${plugin.owner}`,
       `- **Tier:** ${NEW_TIER} (new plugins always start here)`,
       `- **Tags:** ${plugin.tags.join(', ') || 'none'}`,
+      `- **Helps with:** ${(plugin.jobs || []).map(j => JOBS.find(x => x.id === j)?.label || j).join(', ')}`,
+      `- **Works with:** ${(plugin.worksWith || []).map(w => WORKS_WITH.find(x => x.id === w)?.label || w).join(', ')}`,
       `- **Files:** ${plugin.files.map(f => '`' + f.path + '`').join(', ')}`,
       '',
       '- [x] Pre-publish checks passed in the publisher',

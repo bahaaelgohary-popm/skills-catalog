@@ -1,4 +1,6 @@
 owner: Bahaa
 tier: Recommended
 tags: [publishing, catalog, github, pull-request]
+jobs: [share]
+works_with: [git, github, terminal]
 use_it_when: You built a skill locally and want to add it to this catalog through a reviewed pull request.

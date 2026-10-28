@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: [code-review, quality, security]
+jobs: [review]
+works_with: [files, git]
+use_it_when: "You want a structured review of a diff, branch or pull request before merging."

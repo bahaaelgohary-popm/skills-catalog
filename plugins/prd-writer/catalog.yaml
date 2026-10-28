@@ -1,4 +1,6 @@
 owner: Bahaa
 tier: Recommended
 tags: [product, prd, spec, planning]
+jobs: [plan]
+works_with: [chat]
 use_it_when: You have a rough idea and need a one-page PRD you can share for feedback.

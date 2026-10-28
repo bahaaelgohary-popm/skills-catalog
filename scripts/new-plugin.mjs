@@ -1,7 +1,8 @@
 // Wrap a skill folder as a plugin in this catalog. Used by the publish-skill skill.
 // Shares file generation and checks with the web Publish page (site/publish-core.mjs).
-// node scripts/new-plugin.mjs --from <dir> --owner <owner> [--name <name>] [--tags a,b]
-//   [--use-it-when "..."] [--description "..."]
+// node scripts/new-plugin.mjs --from <dir> --owner <owner> --jobs <ids> --works-with <ids>
+//   [--name <name>] [--tags a,b] [--use-it-when "..."] [--description "..."]
+// --jobs and --works-with take comma-separated ids from JOBS and WORKS_WITH in site/publish-core.mjs.
 // New plugins always start as Experimental.
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, dirname, relative } from 'node:path';
@@ -29,6 +30,8 @@ const plugin = {
   owner: args.owner,
   tags: tagsFrom(args.tags),
   useItWhen: args['use-it-when'] || description,
+  jobs: tagsFrom(args.jobs),
+  worksWith: tagsFrom(args['works-with']),
   files: upload.files,
 };
 

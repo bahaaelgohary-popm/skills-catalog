@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: [testing, quality, release]
+jobs: [review, ship]
+works_with: [chat, files]
+use_it_when: "A feature is about to be built or released and you need a risk-based test plan."

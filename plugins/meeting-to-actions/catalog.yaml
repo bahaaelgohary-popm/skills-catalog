@@ -1,4 +1,6 @@
 owner: Bahaa
 tier: Experimental
 tags: [meetings, notes, actions, productivity]
+jobs: [meetings]
+works_with: [chat]
 use_it_when: You have messy meeting notes or a transcript and need clear decisions and next steps.

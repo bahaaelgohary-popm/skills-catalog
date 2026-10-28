@@ -4,7 +4,7 @@
 // Usage: node scripts/build-catalog.mjs [outDir]   (default: _site)
 import { mkdirSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { ROOT, MARKETPLACE, readJson, readYaml, pluginDir, join } from './lib.mjs';
+import { ROOT, MARKETPLACE, JOBS, WORKS_WITH, readJson, readYaml, pluginDir, join } from './lib.mjs';
 import { capabilities } from './capabilities.mjs';
 
 const outDir = join(ROOT, process.argv[2] || '_site');
@@ -55,12 +55,25 @@ const repo = repoSlug();
 
 mkdirSync(join(outDir, 'files'), { recursive: true });
 
+const STALE_DAYS = 90;
+
+// Skill: exactly one skill and nothing else. Agent: agents only. Plugin: a bundle of several components.
+function itemType(files) {
+  const skills = files.filter(f => /^skills\/[^/]+\/SKILL\.md$/.test(f.path)).length;
+  const agents = files.filter(f => /^agents\/.+\.md$/.test(f.path)).length;
+  const commands = files.filter(f => /^commands\/.+\.md$/.test(f.path)).length;
+  if (skills === 1 && agents + commands === 0) return 'Skill';
+  if (agents > 0 && skills + commands === 0) return 'Agent';
+  return 'Plugin';
+}
+
 const plugins = market.plugins.map(entry => {
   const dir = pluginDir(entry);
   const manifest = readJson(join(dir, '.claude-plugin', 'plugin.json'));
   const meta = readYaml(join(dir, 'catalog.yaml'));
   const files = listFiles(dir).map(rel => fileEntry(dir, rel));
   writeFileSync(join(outDir, 'files', `${entry.name}.json`), JSON.stringify({ name: entry.name, files }) + '\n');
+  const lastUpdated = git('log', '-1', '--format=%cI', '--', entry.source) || null;
   return {
     name: entry.name,
     description: manifest.description || entry.description || '',
@@ -69,7 +82,14 @@ const plugins = market.plugins.map(entry => {
     tier: meta.tier,
     tags: meta.tags || [],
     useItWhen: meta.use_it_when || '',
-    lastUpdated: git('log', '-1', '--format=%cI', '--', entry.source) || null,
+    jobs: meta.jobs || [],
+    worksWith: meta.works_with || [],
+    type: itemType(files),
+    deprecated: meta.deprecated === 'true',
+    replacedBy: meta.replaced_by || null,
+    stale: !!lastUpdated && (Date.now() - new Date(lastUpdated)) / 86400000 > STALE_DAYS,
+    lastUpdated,
+    addedAt: git('log', '--format=%cI', '--', entry.source).split('\n').filter(Boolean).pop() || null,
     path: entry.source.replace(/^\.\//, ''),
     fileCount: files.length,
     capabilities: capabilities(files, manifest, entry.name),
@@ -85,6 +105,9 @@ const catalog = {
   repo,
   addMarketplace: `claude plugin marketplace add ${repo || '<owner>/' + market.name}`,
   generatedAt: new Date().toISOString(),
+  staleDays: STALE_DAYS,
+  jobs: JOBS,
+  worksWith: WORKS_WITH,
   plugins,
 };
 

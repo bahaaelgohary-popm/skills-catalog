@@ -3,222 +3,101 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Skills Catalog</title>
-<meta name="description" content="A catalog of Claude Code skills, each installable as a plugin.">
+<title>Skills Marketplace</title>
+<meta name="description" content="A marketplace of Claude Code skills, agents and plugins, each installable as a plugin.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="tokens.css">
 <style>
   *, *::before, *::after { box-sizing: border-box; }
-  html { -webkit-text-size-adjust: 100%; }
-  body {
-    margin: 0;
-    background: var(--bg-page);
-    color: var(--text-body);
-    font-family: var(--font-text);
-    font-size: 14px;
-    line-height: 1.55;
-    overflow-x: hidden;
-  }
-  .wrap { max-width: 1040px; margin: 0 auto; padding: 40px 16px 64px; }
-
-  header h1 {
-    margin: 0 0 4px;
-    color: var(--text-primary);
-    font-size: 24px;
-    font-weight: 600;
-    letter-spacing: -0.02em;
-    line-height: 1.25;
-  }
-  header p { margin: 0 0 20px; color: var(--text-secondary); }
-  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
-  a.btn-secondary { display: inline-block; text-decoration: none; }
-
-  .panel {
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 16px;
-  }
-  .panel-label { margin: 0 0 8px; color: var(--text-muted); font-size: 13px; font-weight: 500; }
-
-  .cmd {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    background: var(--code-bg);
-    color: var(--code-text);
-    border-radius: var(--radius-control);
-    padding: 10px 10px 10px 14px;
-  }
-  .cmd code {
-    flex: 1;
-    min-width: 0;
-    font-family: var(--font-mono);
-    font-size: 12px;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg-page); color: var(--text-body); font-family: var(--font-text); font-size: 14px; line-height: 1.55; overflow-x: hidden; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 32px 16px 64px; }
+  [hidden] { display: none !important; }
+  .mono { font-family: var(--font-mono); }
+  a { color: var(--text-secondary); }
   button { font: inherit; cursor: pointer; }
-  .btn-primary {
-    flex: none;
-    border: 1px solid var(--accent-strong);
-    background: var(--accent-strong);
-    color: var(--on-accent);
-    font-size: 13px;
-    font-weight: 700;
-    border-radius: var(--radius-control);
-    padding: 6px 14px;
-  }
-  .btn-primary:hover, .btn-primary:active { outline: 1px solid var(--accent-strong); outline-offset: 1px; }
-
-  .btn-secondary {
-    flex: none;
-    border: 1px solid var(--border);
-    background: var(--bg-subtle);
-    color: var(--text-primary);
-    font-size: 13px;
-    font-weight: 700;
-    border-radius: var(--radius-control);
-    padding: 5px 12px;
-  }
-  .btn-secondary:hover { background: var(--bg-subtle-hover); }
-
-  .copied, .copied:hover { background: var(--success-bg); border-color: var(--recommended-border); color: var(--success); outline: none; }
-
   :focus-visible { outline: 2px solid var(--accent-soft-border); outline-offset: 2px; }
 
-  .toolbar { display: flex; flex-wrap: wrap; gap: 12px; align-items: center; margin: 24px 0 16px; }
-  .search {
-    flex: 1 1 260px;
-    min-width: 0;
-    height: 36px;
-    padding: 0 12px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-control);
-    background: var(--bg-card);
-    color: var(--text-primary);
-    font: inherit;
-  }
+  /* Buttons */
+  .btn-primary { flex: none; border: 1px solid var(--accent-strong); background: var(--accent-strong); color: var(--on-accent); font-size: 13px; font-weight: 700; border-radius: var(--radius-control); padding: 6px 14px; }
+  .btn-primary:hover, .btn-primary:active { outline: 1px solid var(--accent-strong); outline-offset: 1px; }
+  .btn-secondary { display: inline-flex; align-items: center; gap: 6px; flex: none; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-weight: 700; border-radius: var(--radius-control); padding: 7px 14px; text-decoration: none; white-space: nowrap; }
+  .btn-secondary:hover { background: var(--bg-subtle-hover); }
+  .btn-link { border: 0; background: none; padding: 0; color: var(--text-secondary); font-size: 13px; text-decoration: underline; text-underline-offset: 2px; }
+  .btn-link:hover { color: var(--text-primary); }
+  .copied, .copied:hover { background: var(--success-bg); border-color: var(--recommended-border); color: var(--success); outline: none; }
+
+  /* Header */
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; }
+  h1 { margin: 0 0 4px; color: var(--text-primary); font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; }
+  .sub { margin: 0; color: var(--text-secondary); }
+  .sub .btn-link { margin-left: 4px; white-space: nowrap; }
+  .popover { position: relative; margin-top: 12px; max-width: 640px; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg-card); font-size: 13px; }
+  .popover h3 { margin: 0 0 8px; color: var(--text-primary); font-size: 13px; font-weight: 600; }
+  .popover dl { margin: 0 0 12px; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 12px; align-items: baseline; }
+  .popover dl:last-child { margin-bottom: 0; }
+  .popover dd { margin: 0; color: var(--text-secondary); }
+  .popover .close { position: absolute; top: 8px; right: 10px; border: 0; background: none; color: var(--text-muted); font-size: 18px; line-height: 1; }
+
+  .search-wrap { max-width: 640px; margin: 28px auto 12px; position: relative; }
+  .search-wrap svg { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: var(--text-faint); pointer-events: none; }
+  .search { width: 100%; height: 44px; padding: 0 14px 0 40px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text-primary); font: inherit; font-size: 14px; }
   .search::placeholder { color: var(--text-faint); }
   .search:focus { outline: none; border-color: var(--accent-soft-border); box-shadow: 0 0 0 3px var(--accent-soft-bg); }
 
-  .filters { display: flex; gap: 6px; }
-  .filter {
-    height: 36px;
-    padding: 0 14px;
-    border: 1px solid var(--border-inactive);
-    border-radius: var(--radius-control);
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    font-size: 13px;
-    font-weight: 500;
-  }
-  .filter:hover { background: var(--bg-subtle-hover); }
-  .filter[aria-pressed="true"] { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--on-accent); font-weight: 700; }
+  .jobs { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; max-width: 860px; margin: 0 auto; }
+  .jobs-label { color: var(--text-muted); font-size: 13px; }
+  .chip { height: 32px; padding: 0 12px; border: 1px solid var(--border-inactive); border-radius: 999px; background: var(--bg-card); color: var(--text-body); font-size: 13px; white-space: nowrap; }
+  .chip:hover { background: var(--bg-subtle-hover); }
+  .chip[aria-pressed="true"] { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--on-accent); font-weight: 700; }
+  .chip .n { margin-left: 4px; color: var(--text-faint); font-size: 12px; }
+  .chip[aria-pressed="true"] .n { color: var(--on-accent); }
 
-  .count { margin: 0 0 12px; color: var(--text-muted); font-size: 13px; }
+  .get-started { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 16px; max-width: 860px; margin: 20px auto 0; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg-card); }
+  .get-started p { margin: 0; color: var(--text-muted); font-size: 13px; }
+  .cmd { display: flex; align-items: center; gap: 12px; flex: 1 1 360px; min-width: 0; background: var(--code-bg); color: var(--code-text); border-radius: var(--radius-control); padding: 8px 8px 8px 14px; }
+  .cmd code { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
 
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
-  .card {
-    position: relative;
-    display: flex;
-    flex-direction: column;
-    background: var(--bg-card);
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    padding: 16px;
-    min-width: 0;
-  }
-  .card-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-  .card h2 {
-    margin: 0;
-    min-width: 0;
-    color: var(--text-primary);
-    font-family: var(--font-mono);
-    font-size: 14px;
-    font-weight: 500;
-    overflow-wrap: anywhere;
-  }
-  .badge {
-    flex: none;
-    padding: 1px 7px;
-    border: 1px solid;
-    border-radius: var(--radius-badge);
-    font-size: 12px;
-    font-weight: 600;
-  }
+  /* Shelves */
+  .shelf { margin-top: 40px; }
+  .shelf-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 12px; margin-bottom: 12px; }
+  .shelf-head h2 { margin: 0; color: var(--text-primary); font-size: 16px; font-weight: 600; }
+  .shelf-head p { margin: 2px 0 0; color: var(--text-muted); font-size: 13px; }
+  .see-all { border: 0; background: none; padding: 0; color: var(--text-primary); font-size: 13px; font-weight: 500; white-space: nowrap; }
+  .see-all:hover { text-decoration: underline; }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 16px; }
+
+  /* Item card */
+  .item { display: flex; flex-direction: column; gap: 6px; min-width: 0; padding: 16px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg-card); color: inherit; text-decoration: none; }
+  .item:hover { border-color: var(--border-inactive); }
+  .item-head { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .item-name { color: var(--text-primary); font-family: var(--font-mono); font-size: 14px; font-weight: 500; overflow-wrap: anywhere; }
+  .item-by { margin-left: 20px; color: var(--text-faint); font-size: 12px; }
+  .item-desc { margin: 4px 0 0; color: var(--text-body); font-size: 13px; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+  .item-labels { display: flex; flex-wrap: wrap; align-items: center; gap: 6px 8px; margin-top: 6px; }
+  .item-foot { margin-top: auto; padding-top: 8px; color: var(--text-faint); font-size: 12px; }
+
+  .type-icon { flex: none; width: 10px; height: 10px; }
+  .t-Skill { background: var(--success); border-radius: 2px; }
+  .t-Agent { background: var(--alert); border-radius: 50%; }
+  .t-Plugin { background: var(--text-primary); transform: rotate(45deg) scale(0.85); }
+
+  .badge { display: inline-block; padding: 1px 7px; border: 1px solid; border-radius: var(--radius-badge); font-size: 12px; font-weight: 600; white-space: nowrap; }
   .badge-Recommended { color: var(--recommended-text); background: var(--recommended-bg); border-color: var(--recommended-border); }
   .badge-Experimental { color: var(--experimental-text); background: var(--experimental-bg); border-color: var(--experimental-border); }
-
-  .use-when { margin: 10px 0 4px; color: var(--text-body); font-size: 14px; }
-  .use-when strong { color: var(--text-primary); font-weight: 600; }
-  .tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 0; padding: 0; list-style: none; }
-  .tags li { padding: 0 6px; border-radius: var(--radius-badge); background: var(--bg-subtle); color: var(--text-muted); font-size: 12px; }
-
-  .meta {
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 8px;
-    margin: 14px 0 12px;
-    padding-top: 12px;
-    border-top: 1px solid var(--divider);
-  }
-  .meta dt { color: var(--text-faint); font-size: 12px; }
-  .meta dd { margin: 0; color: var(--text-secondary); font-size: 13px; overflow-wrap: anywhere; }
-  .mono { font-family: var(--font-mono); }
-
-  .install {
-    margin-top: auto;
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 6px 6px 6px 10px;
-    border: 1px solid var(--divider);
-    border-radius: var(--radius-control);
-    background: var(--bg-subtle);
-  }
-  .install code { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 12px; color: var(--text-body); overflow-wrap: break-word; }
-  .install .btn-secondary { background: var(--bg-card); }
-  .install .btn-secondary:hover { background: var(--bg-subtle-hover); }
-
-  /* Whole card links to the skill page: the name link's ::after covers the card. */
-  .card:hover { border-color: var(--border-inactive); }
-  .card-open { color: inherit; text-decoration: none; }
-  .card-open::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-card); }
-  .card-open:focus-visible { outline: none; }
-  .card-open:focus-visible::after { outline: 2px solid var(--accent-soft-border); outline-offset: 2px; }
-  .install { position: relative; z-index: 1; }
-  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 10px; color: var(--text-muted); font-size: 12px; }
-  .card:hover .card-foot .more { color: var(--text-primary); }
-
-  .cap { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; border: 1px solid var(--border); border-radius: var(--radius-badge); background: var(--bg-card); color: var(--text-secondary); font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .badge-deprecated { color: var(--alert); background: var(--bg-card); border-color: var(--alert); }
+  .badge-stale { color: var(--text-muted); background: var(--bg-subtle); border-color: var(--border); }
+  .cap { display: inline-flex; align-items: center; gap: 6px; color: var(--text-secondary); font-size: 12px; white-space: nowrap; }
   .cap::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--text-faint); }
   .cap-instructions::before { background: var(--success); }
   .cap-tools::before { background: var(--warning); }
   .cap-code::before { background: var(--alert); }
 
-  /* In review: open publish pull requests, read live from GitHub. */
-  .review { margin: 24px 0 0; }
-  .review-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
-  .review-head h2 { margin: 0; color: var(--text-primary); font-size: 16px; font-weight: 600; }
-  .review-head .fine { color: var(--text-muted); font-size: 13px; }
-  .btn-link { border: 0; background: none; padding: 0; color: var(--text-secondary); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
-  .review-list { display: grid; gap: 8px; }
-  .pr {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    align-items: center;
-    gap: 4px 16px;
-    padding: 12px 16px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-card);
-    background: var(--bg-card);
-    color: inherit;
-    text-decoration: none;
-  }
+  /* In review */
+  .pr-list { display: grid; gap: 8px; }
+  .pr { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: 4px 16px; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg-card); color: inherit; text-decoration: none; }
   .pr:hover { border-color: var(--border-inactive); }
   .pr-name { color: var(--text-primary); font-family: var(--font-mono); font-size: 14px; overflow-wrap: anywhere; }
   .pr-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; color: var(--text-muted); font-size: 12px; }
@@ -229,22 +108,79 @@
   .st-passed { color: var(--success); background: var(--success-bg); }
   .st-failed { color: var(--alert); background: var(--bg-subtle); }
   .st-waiting { color: var(--text-muted); background: var(--bg-subtle); }
-  @media (max-width: 480px) {
-    .pr { grid-template-columns: minmax(0, 1fr); }
-    .pr-status { grid-row: auto; grid-column: auto; justify-self: start; }
-  }
+
+  /* Browse all */
+  .browse { margin-top: 48px; padding-top: 8px; scroll-margin-top: 16px; }
+  .browse > h2 { margin: 0 0 16px; color: var(--text-primary); font-size: 16px; font-weight: 600; }
+  .browse-layout { display: grid; grid-template-columns: 240px minmax(0, 1fr); gap: 24px; align-items: start; }
+  .filters { position: sticky; top: 16px; }
+  .filters-head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 4px; }
+  .filters-head h3 { margin: 0; color: var(--text-primary); font-size: 13px; font-weight: 600; }
+  .fgroup { border-top: 1px solid var(--border); }
+  .fgroup summary { display: flex; align-items: center; justify-content: space-between; padding: 12px 0; color: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; cursor: pointer; list-style: none; }
+  .fgroup summary::-webkit-details-marker { display: none; }
+  .fgroup summary::after { content: "›"; font-size: 14px; transition: transform 0.15s; }
+  .fgroup[open] summary::after { transform: rotate(90deg); }
+  .fgroup .opts { padding: 0 0 12px; }
+  .opt { display: flex; align-items: center; gap: 8px; padding: 4px 6px; margin: 0 -6px; border-radius: var(--radius-badge); color: var(--text-body); font-size: 13px; cursor: pointer; }
+  .opt:hover { background: var(--bg-subtle-hover); }
+  .opt input { margin: 0; accent-color: var(--accent-strong); }
+  .opt .lbl { flex: 1; min-width: 0; overflow-wrap: anywhere; }
+  .opt .n { color: var(--text-faint); font-size: 12px; }
+  .opt.zero { color: var(--text-faint); }
+  .toggle-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 12px 0; border-top: 1px solid var(--border); font-size: 13px; color: var(--text-body); }
+  .toggle-row small { display: block; color: var(--text-faint); font-size: 12px; }
+  .switch { position: relative; flex: none; width: 34px; height: 20px; border: 1px solid var(--border-inactive); border-radius: 999px; background: var(--bg-subtle); }
+  .switch::after { content: ""; position: absolute; top: 2px; left: 2px; width: 14px; height: 14px; border-radius: 50%; background: var(--bg-card); border: 1px solid var(--border-inactive); transition: left 0.15s; }
+  .switch[aria-checked="true"] { background: var(--accent-strong); border-color: var(--accent-strong); }
+  .switch[aria-checked="true"]::after { left: 16px; border-color: var(--accent-strong); }
+
+  .results-bar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 16px; margin-bottom: 12px; }
+  .results-bar .count { color: var(--text-secondary); font-size: 13px; }
+  .bar-right { display: flex; align-items: center; gap: 8px; }
+  .bar-right label { color: var(--text-muted); font-size: 13px; }
+  select { height: 34px; padding: 0 28px 0 10px; border: 1px solid var(--border); border-radius: var(--radius-control); background: var(--bg-card); color: var(--text-primary); font: inherit; font-size: 13px; }
+  .view-toggle { display: inline-flex; border: 1px solid var(--border); border-radius: var(--radius-control); overflow: hidden; }
+  .view-toggle button { width: 34px; height: 32px; border: 0; background: var(--bg-card); color: var(--text-secondary); }
+  .view-toggle button[aria-pressed="true"] { background: var(--text-primary); color: var(--bg-card); }
+  .active-filters { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin-bottom: 12px; }
+  .pill { display: inline-flex; align-items: center; gap: 6px; padding: 2px 6px 2px 10px; border: 1px solid var(--accent-soft-border); border-radius: 999px; background: var(--accent-soft-bg); color: var(--text-primary); font-size: 12px; }
+  .pill button { border: 0; background: none; padding: 0 4px; color: var(--text-muted); font-size: 14px; line-height: 1; }
+  .filters-btn { display: none; }
+
+  /* List view */
+  .list { display: grid; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg-card); overflow: hidden; }
+  .row { display: grid; grid-template-columns: minmax(0, 2.2fr) minmax(0, 1fr) auto minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 10px 16px; border-top: 1px solid var(--divider); color: inherit; text-decoration: none; font-size: 13px; }
+  .row:first-child { border-top: 0; }
+  .row:hover { background: var(--bg-subtle-hover); }
+  .row .nm { display: flex; align-items: center; gap: 10px; min-width: 0; }
+  .row .nm span:last-child { color: var(--text-primary); font-family: var(--font-mono); overflow-wrap: anywhere; }
+  .row .muted { color: var(--text-muted); font-size: 12px; }
+  .row.head { background: var(--bg-subtle); color: var(--text-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; }
+  .row.head:hover { background: var(--bg-subtle); }
 
   .state { padding: 32px 16px; text-align: center; color: var(--text-muted); }
   .state.error { color: var(--alert); }
+  .empty { padding: 40px 16px; border: 1px dashed var(--border-inactive); border-radius: var(--radius-card); text-align: center; color: var(--text-secondary); }
+  .empty p { margin: 0 0 8px; }
 
-  footer { margin-top: 40px; color: var(--text-faint); font-size: 13px; }
-  footer a { color: var(--text-secondary); }
+  footer { margin-top: 48px; color: var(--text-faint); font-size: 13px; }
 
-  @media (max-width: 480px) {
-    .wrap { padding-top: 24px; }
+  @media (max-width: 860px) {
+    .browse-layout { grid-template-columns: minmax(0, 1fr); }
+    .filters { position: static; display: none; padding: 12px 16px; border: 1px solid var(--border); border-radius: var(--radius-card); background: var(--bg-card); }
+    .filters.open { display: block; }
+    .filters-btn { display: inline-flex; }
+    .row { grid-template-columns: minmax(0, 1fr) auto; }
+    .row > :nth-child(2), .row > :nth-child(4) { display: none; }
+  }
+  @media (max-width: 520px) {
+    .wrap { padding-top: 20px; }
+    .topbar { flex-direction: column; }
     .grid { grid-template-columns: minmax(0, 1fr); }
-    .filters { width: 100%; }
-    .filter { flex: 1; }
+    .pr { grid-template-columns: minmax(0, 1fr); }
+    .pr-status { grid-row: auto; grid-column: auto; justify-self: start; }
+    .bar-right label { display: none; }
   }
 </style>
 </head>
@@ -252,39 +188,88 @@
 <div class="wrap">
   <header>
     <div class="topbar">
-      <h1>Skills Catalog</h1>
-      <a class="btn-secondary" href="publish.html">Publish a skill</a>
-    </div>
-    <p id="tagline">Claude Code skills, each packaged as a plugin you can install.</p>
-    <section class="panel" aria-labelledby="add-label">
-      <p class="panel-label" id="add-label">Add the marketplace once, then install any skill below.</p>
-      <div class="cmd">
-        <code id="add-cmd">claude plugin marketplace add …</code>
-        <button class="btn-primary" type="button" data-copy-target="add-cmd">Copy</button>
+      <div>
+        <h1>Skills Marketplace</h1>
+        <p class="sub">Claude Code skills, agents and plugins. Each has an owner and one of two tiers, Experimental or Recommended.
+          <button class="btn-link" type="button" id="tiers-btn" aria-expanded="false" aria-controls="tiers-pop">What the tiers mean</button></p>
       </div>
-    </section>
+      <a class="btn-secondary" href="publish.html"><span aria-hidden="true">↑</span> Publish</a>
+    </div>
+    <div class="popover" id="tiers-pop" role="region" aria-label="Tiers and labels" hidden>
+      <button class="close" type="button" aria-label="Close" id="tiers-close">×</button>
+      <h3>Tiers</h3>
+      <dl>
+        <dt><span class="badge badge-Experimental">Experimental</span></dt><dd>Every new item starts here, after automated checks pass and a reviewer merges it.</dd>
+        <dt><span class="badge badge-Recommended">Recommended</span></dt><dd>Promoted by a reviewer once it has proven useful.</dd>
+      </dl>
+      <h3>What it can do</h3>
+      <dl>
+        <dt><span class="cap cap-instructions">Instructions only</span></dt><dd>Markdown instructions. No bundled code; Claude asks before running any command.</dd>
+        <dt><span class="cap cap-tools">Pre-approved tools</span></dt><dd>Lets Claude use some tools without asking while it runs.</dd>
+        <dt><span class="cap cap-code">Runs code</span></dt><dd>Includes scripts, hooks or servers that run on your machine. Read them first.</dd>
+      </dl>
+    </div>
+
+    <div class="search-wrap" role="search">
+      <svg width="16" height="16" viewBox="0 0 16 16" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5" stroke="currentColor" stroke-width="1.5"/><path d="M11 11l3.5 3.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/></svg>
+      <input id="q" class="search" type="search" placeholder="Search by name, tool or what it does" autocomplete="off" aria-label="Search the marketplace">
+    </div>
+    <div class="jobs" id="jobs" role="group" aria-label="I want to…"><span class="jobs-label">I want to…</span></div>
+
+    <div class="get-started">
+      <p>New here? Add the marketplace once, then install anything below.</p>
+      <div class="cmd"><code id="add-cmd">claude plugin marketplace add …</code><button class="btn-primary" type="button" data-copy-target="add-cmd">Copy</button></div>
+    </div>
   </header>
 
   <main>
-    <section class="review" id="in-review" aria-labelledby="review-title" hidden>
-      <div class="review-head">
-        <h2 id="review-title">In review</h2>
-        <span class="fine" id="review-note">Submitted skills waiting for checks and a reviewer. They join the catalog when merged.</span>
-        <button class="btn-link" type="button" id="review-refresh">Refresh</button>
-      </div>
-      <div class="review-list" id="review-list"></div>
-    </section>
-
-    <div class="toolbar" role="search">
-      <input id="q" class="search" type="search" placeholder="Search by name, description or tag" autocomplete="off" aria-label="Search skills">
-      <div class="filters" role="group" aria-label="Filter by tier">
-        <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
-        <button class="filter" type="button" data-filter="Recommended" aria-pressed="false">Recommended</button>
-        <button class="filter" type="button" data-filter="Experimental" aria-pressed="false">Experimental</button>
-      </div>
+    <div id="shelves">
+      <section class="shelf" id="in-review" aria-labelledby="review-title" hidden>
+        <div class="shelf-head">
+          <div><h2 id="review-title">In review</h2><p id="review-note">Submitted, waiting for checks and a reviewer. They join the marketplace when merged.</p></div>
+          <button class="see-all" type="button" id="review-refresh">Refresh</button>
+        </div>
+        <div class="pr-list" id="review-list"></div>
+      </section>
+      <div id="shelf-slots"><p class="state">Loading the marketplace…</p></div>
     </div>
-    <p class="count" id="count" aria-live="polite"></p>
-    <div class="grid" id="grid"><p class="state">Loading catalog…</p></div>
+
+    <section class="browse" id="browse" aria-labelledby="browse-title">
+      <h2 id="browse-title">Browse all</h2>
+      <div class="browse-layout">
+        <aside class="filters" id="filters" aria-label="Filters">
+          <div class="filters-head"><h3>Filters</h3><button class="btn-link" type="button" id="clear-all">Clear all</button></div>
+          <div id="facet-groups"></div>
+          <div class="toggle-row">
+            <span>Show stale and deprecated<small id="hidden-count"></small></span>
+            <button class="switch" type="button" role="switch" aria-checked="false" id="show-old" aria-label="Show stale and deprecated items"></button>
+          </div>
+        </aside>
+        <div>
+          <div class="results-bar">
+            <div class="bar-right">
+              <button class="btn-secondary filters-btn" type="button" id="filters-btn" aria-controls="filters" aria-expanded="false">Filters</button>
+              <span class="count" id="count" aria-live="polite"></span>
+            </div>
+            <div class="bar-right">
+              <label for="sort">Sort by</label>
+              <select id="sort">
+                <option value="best">Best match</option>
+                <option value="updated">Recently updated</option>
+                <option value="newest">Newest</option>
+                <option value="name">Name A–Z</option>
+              </select>
+              <div class="view-toggle" role="group" aria-label="View">
+                <button type="button" data-view="grid" aria-pressed="true" aria-label="Grid view" title="Grid view">▦</button>
+                <button type="button" data-view="list" aria-pressed="false" aria-label="List view" title="List view">☰</button>
+              </div>
+            </div>
+          </div>
+          <div class="active-filters" id="active-filters" hidden></div>
+          <div id="results"></div>
+        </div>
+      </div>
+    </section>
   </main>
 
   <footer id="footer">Generated from the repository's marketplace.json.</footer>
@@ -292,96 +277,281 @@
 
 <script>
 (() => {
-  const grid = document.getElementById('grid');
-  const count = document.getElementById('count');
-  const q = document.getElementById('q');
-  const filterButtons = [...document.querySelectorAll('.filter')];
-  let plugins = [];
-  let tier = 'all';
-
+  const $ = (id) => document.getElementById(id);
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
-  const rank = (p) => (p.tier === 'Recommended' ? 0 : 1);
+  const time = (iso) => iso ? new Date(iso).getTime() : 0;
 
-  async function copy(text, btn) {
-    try {
-      await navigator.clipboard.writeText(text);
-    } catch {
-      const ta = Object.assign(document.createElement('textarea'), { value: text });
-      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  let catalog = null;
+  let items = [];
+  const SHELF_SIZE = 6;
+
+  // ---- Filter state, kept in the URL so "See all" and shared links open the same view ----
+  const FACETS = [
+    { key: 'type', title: 'Type', value: p => [p.type], label: v => v },
+    { key: 'tier', title: 'Trust tier', value: p => [p.tier], label: v => v, order: ['Recommended', 'Experimental'] },
+    { key: 'cap', title: 'What it can do', value: p => [p.capabilities?.label].filter(Boolean), label: v => v, order: ['Instructions only', 'Pre-approved tools', 'Runs code'] },
+    { key: 'works', title: 'Works with', value: p => p.worksWith || [], label: v => catalog.worksWith.find(w => w.id === v)?.label || v },
+    { key: 'owner', title: 'Owner', value: p => [p.owner], label: v => v },
+  ];
+  const state = { q: '', job: '', sort: 'best', view: 'grid', all: false, f: Object.fromEntries(FACETS.map(f => [f.key, []])) };
+
+  function readUrl() {
+    const u = new URLSearchParams(location.search);
+    state.q = u.get('q') || '';
+    state.job = u.get('job') || '';
+    state.sort = u.get('sort') || 'best';
+    state.view = u.get('view') === 'list' ? 'list' : 'grid';
+    state.all = u.get('all') === '1';
+    for (const f of FACETS) state.f[f.key] = (u.get(f.key) || '').split(',').filter(Boolean);
+  }
+  function writeUrl() {
+    const u = new URLSearchParams();
+    if (state.q) u.set('q', state.q);
+    if (state.job) u.set('job', state.job);
+    for (const f of FACETS) if (state.f[f.key].length) u.set(f.key, state.f[f.key].join(','));
+    if (state.sort !== 'best') u.set('sort', state.sort);
+    if (state.view !== 'grid') u.set('view', state.view);
+    if (state.all) u.set('all', '1');
+    const qs = u.toString();
+    history.replaceState(null, '', `${location.pathname}${qs ? `?${qs}` : ''}${location.hash}`);
+  }
+  const filtering = () => !!(state.q || state.job || FACETS.some(f => state.f[f.key].length));
+
+  // ---- Matching and ranking ----
+  const terms = () => state.q.toLowerCase().split(/\s+/).filter(Boolean);
+  function score(p, ts) {
+    if (!ts.length) return 0;
+    let s = 0;
+    for (const t of ts) {
+      const name = p.name.toLowerCase();
+      const hay = [p.description, p.useItWhen, ...(p.tags || []), p.owner,
+        ...(p.worksWith || []).map(w => catalog.worksWith.find(x => x.id === w)?.label || w),
+        ...(p.jobs || []).map(j => catalog.jobs.find(x => x.id === j)?.label || j)].join(' ').toLowerCase();
+      if (name === t) s += 100; else if (name.startsWith(t)) s += 60; else if (name.includes(t)) s += 40;
+      else if ((p.tags || []).some(x => x.toLowerCase() === t)) s += 25;
+      else if (hay.includes(t)) s += 10;
+      else return -1; // every term must match somewhere
     }
-    const label = btn.textContent;
-    btn.textContent = 'Copied';
-    btn.classList.add('copied');
-    setTimeout(() => { btn.textContent = label; btn.classList.remove('copied'); }, 1500);
+    return s;
+  }
+  const visibleBase = () => items.filter(p => state.all || (!p.stale && !p.deprecated));
+  function matchesExcept(p, skipKey) {
+    if (state.job && !(p.jobs || []).includes(state.job)) return false;
+    for (const f of FACETS) {
+      if (f.key === skipKey || !state.f[f.key].length) continue;
+      if (!f.value(p).some(v => state.f[f.key].includes(v))) return false;
+    }
+    return true;
+  }
+  function results() {
+    const ts = terms();
+    const scored = visibleBase().map(p => ({ p, s: score(p, ts) })).filter(x => x.s >= 0 && matchesExcept(x.p));
+    const tierRank = (p) => (p.tier === 'Recommended' ? 0 : 1);
+    const by = {
+      best: (a, b) => b.s - a.s || tierRank(a.p) - tierRank(b.p) || time(b.p.lastUpdated) - time(a.p.lastUpdated) || a.p.name.localeCompare(b.p.name),
+      updated: (a, b) => time(b.p.lastUpdated) - time(a.p.lastUpdated) || a.p.name.localeCompare(b.p.name),
+      newest: (a, b) => time(b.p.addedAt) - time(a.p.addedAt) || a.p.name.localeCompare(b.p.name),
+      name: (a, b) => a.p.name.localeCompare(b.p.name),
+    }[state.sort] || ((a, b) => 0);
+    return scored.sort(by).map(x => x.p);
   }
 
-  document.addEventListener('click', (e) => {
-    const btn = e.target.closest('button[data-copy-target], button[data-copy]');
-    if (!btn) return;
-    const text = btn.dataset.copy ?? document.getElementById(btn.dataset.copyTarget).textContent;
-    copy(text, btn);
-  });
-
-  filterButtons.forEach(b => b.addEventListener('click', () => {
-    tier = b.dataset.filter;
-    filterButtons.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
-    render();
-  }));
-  q.addEventListener('input', render);
-
-  function matches(p, terms) {
-    const hay = [p.name, p.description, ...(p.tags || [])].join(' ').toLowerCase();
-    return terms.every(t => hay.includes(t));
+  // ---- Rendering ----
+  const href = (p) => `skill.html?name=${encodeURIComponent(p.name)}`;
+  function labels(p) {
+    const cap = p.capabilities;
+    return `<span class="badge badge-${esc(p.tier)}">${esc(p.tier)}</span>` +
+      (p.deprecated ? '<span class="badge badge-deprecated">Deprecated</span>' : p.stale ? '<span class="badge badge-stale">Stale</span>' : '') +
+      (cap ? `<span class="cap cap-${esc(cap.level)}" title="${esc(cap.summary)}">${esc(cap.label)}</span>` : '');
   }
-
   function card(p) {
-    const tags = (p.tags || []).map(t => `<li>${esc(t)}</li>`).join('');
-    return `<article class="card">
-      <div class="card-head">
-        <h2><a class="card-open" href="skill.html?name=${encodeURIComponent(p.name)}">${esc(p.name)}</a></h2>
-        <span class="badge badge-${esc(p.tier)}">${esc(p.tier)}</span>
-      </div>
-      <p class="use-when"><strong>Use it when:</strong> ${esc(p.useItWhen)}</p>
-      ${tags ? `<ul class="tags" aria-label="Tags">${tags}</ul>` : ''}
-      <dl class="meta">
-        <div><dt>Owner</dt><dd>${esc(p.owner)}</dd></div>
-        <div><dt>Version</dt><dd class="mono">${esc(p.version || '—')}</dd></div>
-        <div><dt>Updated</dt><dd>${esc(fmtDate(p.lastUpdated))}</dd></div>
-      </dl>
-      <p class="card-foot">${p.capabilities ? `<span class="cap cap-${esc(p.capabilities.level)}" title="${esc(p.capabilities.summary)}">${esc(p.capabilities.label)}</span>` : '<span></span>'}<span class="more">Details →</span></p>
-      <div class="install">
-        <code>${esc(p.install)}</code>
-        <button class="btn-secondary" type="button" data-copy="${esc(p.install)}" aria-label="Copy install command for ${esc(p.name)}">Copy</button>
-      </div>
-    </article>`;
+    return `<a class="item" href="${href(p)}">
+      <div class="item-head"><span class="type-icon t-${esc(p.type)}" title="${esc(p.type)}"></span><span class="item-name">${esc(p.name)}</span></div>
+      <div class="item-by">by ${esc(p.owner)}</div>
+      <p class="item-desc">${esc(p.description)}</p>
+      <div class="item-labels">${labels(p)}</div>
+      <div class="item-foot">${esc(p.type)} · v${esc(p.version || '—')} · Updated ${esc(fmtDate(p.lastUpdated))}</div>
+    </a>`;
+  }
+  function row(p) {
+    return `<a class="row" href="${href(p)}">
+      <span class="nm"><span class="type-icon t-${esc(p.type)}" title="${esc(p.type)}"></span><span>${esc(p.name)}</span></span>
+      <span class="muted">${esc(p.owner)}</span>
+      <span class="item-labels" style="margin:0">${labels(p)}</span>
+      <span class="muted">${esc(p.type)}</span>
+      <span class="muted">${esc(fmtDate(p.lastUpdated))}</span>
+    </a>`;
+  }
+
+  function renderJobs() {
+    const base = visibleBase();
+    $('jobs').innerHTML = '<span class="jobs-label">I want to…</span>' + catalog.jobs
+      .map(j => ({ ...j, n: base.filter(p => (p.jobs || []).includes(j.id)).length }))
+      .filter(j => j.n > 0)
+      .map(j => `<button class="chip" type="button" data-job="${esc(j.id)}" aria-pressed="${state.job === j.id}">${esc(j.label)}<span class="n">${j.n}</span></button>`).join('');
+  }
+
+  function renderShelves() {
+    const live = items.filter(p => !p.stale && !p.deprecated);
+    const shelves = [
+      { id: 'recommended', title: 'Recommended', sub: 'Promoted by reviewers after they proved useful', list: live.filter(p => p.tier === 'Recommended').sort((a, b) => a.name.localeCompare(b.name)), see: { tier: ['Recommended'] } },
+      { id: 'new', title: 'New and experimental', sub: 'Passed automated checks and review, looking for early users', list: live.filter(p => p.tier === 'Experimental').sort((a, b) => time(b.addedAt) - time(a.addedAt)), see: { tier: ['Experimental'], sort: 'newest' } },
+      { id: 'updated', title: 'Recently updated', sub: 'Latest changes across the marketplace', list: [...live].sort((a, b) => time(b.lastUpdated) - time(a.lastUpdated)), see: { sort: 'updated' } },
+    ];
+    $('shelf-slots').innerHTML = shelves.filter(s => s.list.length).map(s => `
+      <section class="shelf" aria-labelledby="shelf-${s.id}">
+        <div class="shelf-head">
+          <div><h2 id="shelf-${s.id}">${esc(s.title)}</h2><p>${esc(s.sub)}</p></div>
+          <button class="see-all" type="button" data-see='${esc(JSON.stringify(s.see))}'>See all ${s.list.length} ›</button>
+        </div>
+        <div class="grid">${s.list.slice(0, SHELF_SIZE).map(card).join('')}</div>
+      </section>`).join('');
+  }
+
+  function renderFacets() {
+    const base = visibleBase();
+    $('facet-groups').innerHTML = FACETS.map(f => {
+      const values = new Set(base.flatMap(f.value));
+      for (const v of state.f[f.key]) values.add(v);
+      const ordered = [...values].sort((a, b) => {
+        const oa = f.order ? f.order.indexOf(a) : -1, ob = f.order ? f.order.indexOf(b) : -1;
+        return (oa < 0 ? 99 : oa) - (ob < 0 ? 99 : ob) || f.label(a).localeCompare(f.label(b));
+      });
+      const scoped = base.filter(p => score(p, terms()) >= 0 && matchesExcept(p, f.key));
+      const opts = ordered.map(v => {
+        const n = scoped.filter(p => f.value(p).includes(v)).length;
+        const on = state.f[f.key].includes(v);
+        return `<label class="opt${n || on ? '' : ' zero'}"><input type="checkbox" data-facet="${f.key}" value="${esc(v)}"${on ? ' checked' : ''}><span class="lbl">${esc(f.label(v))}</span><span class="n">${n}</span></label>`;
+      }).join('');
+      const open = f.key === 'type' || state.f[f.key].length ? ' open' : '';
+      return `<details class="fgroup"${open}><summary>${esc(f.title)}${state.f[f.key].length ? ` · ${state.f[f.key].length}` : ''}</summary><div class="opts">${opts}</div></details>`;
+    }).join('');
+    const hidden = items.filter(p => p.stale || p.deprecated).length;
+    $('hidden-count').textContent = hidden ? `+${hidden} hidden` : 'None right now';
+    $('show-old').setAttribute('aria-checked', String(state.all));
+  }
+
+  function renderActive() {
+    const pills = [];
+    if (state.q) pills.push(['q', '', `“${state.q}”`]);
+    if (state.job) pills.push(['job', '', catalog.jobs.find(j => j.id === state.job)?.label || state.job]);
+    for (const f of FACETS) for (const v of state.f[f.key]) pills.push([f.key, v, `${f.title}: ${f.label(v)}`]);
+    const el = $('active-filters');
+    el.hidden = !pills.length;
+    el.innerHTML = pills.map(([k, v, label]) => `<span class="pill">${esc(label)}<button type="button" data-remove="${esc(k)}" data-value="${esc(v)}" aria-label="Remove ${esc(label)}">×</button></span>`).join('') +
+      (pills.length ? '<button class="btn-link" type="button" data-clear>Clear all</button>' : '');
+    const n = FACETS.reduce((s, f) => s + state.f[f.key].length, 0) + (state.job ? 1 : 0);
+    $('filters-btn').textContent = n ? `Filters (${n})` : 'Filters';
+  }
+
+  function renderResults() {
+    const list = results();
+    $('count').textContent = `${list.length} item${list.length === 1 ? '' : 's'}`;
+    $('sort').value = state.sort;
+    document.querySelectorAll('[data-view]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.view === state.view)));
+    if (!list.length) {
+      const ask = catalog.repo
+        ? `https://github.com/${catalog.repo}/issues/new?title=${encodeURIComponent(`Skill request: ${state.q || 'something new'}`)}&body=${encodeURIComponent('What I wanted to do:\n\nWhat I searched for: ' + (state.q || '(filters only)'))}`
+        : null;
+      $('results').innerHTML = `<div class="empty"><p>Nothing matches${state.q ? ` “${esc(state.q)}”` : ' these filters'}.</p>
+        <p>${ask ? `<a href="${esc(ask)}" target="_blank" rel="noopener">Ask for it</a> · ` : ''}<button class="btn-link" type="button" data-clear>Clear filters</button>${state.all ? '' : ' · <button class="btn-link" type="button" data-show-old>Include stale and deprecated</button>'}</p></div>`;
+      return;
+    }
+    $('results').innerHTML = state.view === 'list'
+      ? `<div class="list" role="list"><div class="row head" aria-hidden="true"><span>Name</span><span>Owner</span><span>Labels</span><span>Type</span><span>Updated</span></div>${list.map(row).join('')}</div>`
+      : `<div class="grid">${list.map(card).join('')}</div>`;
   }
 
   function render() {
-    const terms = q.value.toLowerCase().split(/\s+/).filter(Boolean);
-    const list = plugins
-      .filter(p => tier === 'all' || p.tier === tier)
-      .filter(p => matches(p, terms))
-      .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
-    count.textContent = `${list.length} of ${plugins.length} skills`;
-    grid.innerHTML = list.length ? list.map(card).join('') : '<p class="state">No skills match your search.</p>';
+    $('shelves').hidden = filtering();
+    renderJobs();
+    renderFacets();
+    renderActive();
+    renderResults();
+    writeUrl();
   }
 
-  // Old #name links opened a pop-up viewer; send them to the skill page instead.
-  function redirectLegacyHash() {
-    const name = decodeURIComponent(location.hash.slice(1));
-    if (name && plugins.some(p => p.name === name)) location.replace(`skill.html?name=${encodeURIComponent(name)}`);
-  }
+  // ---- Events ----
+  let searchTimer;
+  $('q').addEventListener('input', () => {
+    clearTimeout(searchTimer);
+    searchTimer = setTimeout(() => { state.q = $('q').value.trim(); render(); }, 120);
+  });
+  $('q').addEventListener('keydown', (e) => { if (e.key === 'Enter') { state.q = $('q').value.trim(); render(); $('browse').scrollIntoView(); } });
+  $('jobs').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-job]');
+    if (!b) return;
+    state.job = state.job === b.dataset.job ? '' : b.dataset.job;
+    render();
+    if (state.job) $('browse').scrollIntoView();
+  });
+  $('shelf-slots').addEventListener('click', (e) => {
+    const b = e.target.closest('[data-see]');
+    if (!b) return;
+    const see = JSON.parse(b.dataset.see);
+    for (const f of FACETS) state.f[f.key] = see[f.key] || [];
+    state.sort = see.sort || 'best';
+    state.q = ''; state.job = ''; $('q').value = '';
+    render();
+    $('browse').scrollIntoView();
+  });
+  $('facet-groups').addEventListener('change', (e) => {
+    const i = e.target.closest('input[data-facet]');
+    if (!i) return;
+    const list = state.f[i.dataset.facet];
+    state.f[i.dataset.facet] = i.checked ? [...list, i.value] : list.filter(v => v !== i.value);
+    render();
+  });
+  document.addEventListener('click', (e) => {
+    const rm = e.target.closest('[data-remove]');
+    if (rm) {
+      const k = rm.dataset.remove;
+      if (k === 'q') { state.q = ''; $('q').value = ''; }
+      else if (k === 'job') state.job = '';
+      else state.f[k] = state.f[k].filter(v => v !== rm.dataset.value);
+      return render();
+    }
+    if (e.target.closest('[data-clear]') || e.target.closest('#clear-all')) {
+      state.q = ''; state.job = ''; $('q').value = '';
+      for (const f of FACETS) state.f[f.key] = [];
+      return render();
+    }
+    if (e.target.closest('[data-show-old]')) { state.all = true; return render(); }
+  });
+  $('show-old').addEventListener('click', () => { state.all = !state.all; render(); });
+  $('sort').addEventListener('change', () => { state.sort = $('sort').value; render(); });
+  document.querySelectorAll('[data-view]').forEach(b => b.addEventListener('click', () => { state.view = b.dataset.view; render(); }));
+  $('filters-btn').addEventListener('click', () => {
+    const open = $('filters').classList.toggle('open');
+    $('filters-btn').setAttribute('aria-expanded', String(open));
+  });
+  const tiersOpen = (open) => { $('tiers-pop').hidden = !open; $('tiers-btn').setAttribute('aria-expanded', String(open)); };
+  $('tiers-btn').addEventListener('click', () => tiersOpen($('tiers-pop').hidden));
+  $('tiers-close').addEventListener('click', () => tiersOpen(false));
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') tiersOpen(false); });
 
-  // In review: open "Add <name> skill" pull requests, with their check status, from GitHub's API.
+  // Copy the add-marketplace command
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-copy-target]');
+    if (!btn) return;
+    const text = $(btn.dataset.copyTarget).textContent;
+    try { await navigator.clipboard.writeText(text); } catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text });
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    btn.textContent = 'Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+
+  // ---- In review: open "Add <name> skill" pull requests with their check status, from GitHub's API ----
   // Without a token GitHub allows 60 requests an hour per visitor, so it loads on open, on Refresh and
   // when the tab comes back into view, and re-checks every 30 s (at most 10 times) while a submission's
   // checks are still pending. With the publisher's token (same tab) it also refreshes every 20 s.
-  const review = document.getElementById('in-review');
-  const reviewList = document.getElementById('review-list');
-  const reviewNote = document.getElementById('review-note');
+  const review = $('in-review');
+  const reviewList = $('review-list');
+  const reviewNote = $('review-note');
   const REVIEW_NOTE = reviewNote.textContent;
-  let repo = null;
   let lastLoad = 0;
   let pendingPolls = 0;
   let pollTimer = null;
@@ -410,13 +580,13 @@
     return ['passed', 'Checks passed'];
   }
   async function loadReview() {
-    if (!repo) return;
+    if (!catalog?.repo) return;
     lastLoad = Date.now();
     try {
-      const prs = (await gh(`/repos/${repo}/pulls?state=open&per_page=30`))
+      const prs = (await gh(`/repos/${catalog.repo}/pulls?state=open&per_page=30`))
         .filter(pr => /^Add .+ skill$/.test(pr.title) || pr.head.ref.startsWith('add-skill/'));
       const rows = await Promise.all(prs.map(async pr => {
-        const [cls, label] = checkState(await gh(`/repos/${repo}/commits/${pr.head.sha}/check-runs`));
+        const [cls, label] = checkState(await gh(`/repos/${catalog.repo}/commits/${pr.head.sha}/check-runs`));
         const name = (pr.title.match(/^Add (.+) skill$/) || [])[1] || pr.head.ref.replace(/^add-skill\//, '');
         return `<a class="pr" href="${esc(pr.html_url)}" target="_blank" rel="noopener">
           <span class="pr-name">${esc(name)}</span>
@@ -426,13 +596,13 @@
       }));
       reviewList.innerHTML = rows.join('');
       reviewNote.textContent = REVIEW_NOTE;
+      review.hidden = rows.length === 0;
       clearTimeout(pollTimer);
       const pending = reviewList.querySelector('.st-waiting, .st-running');
       if (pending && !token && pendingPolls < 10) {
         pendingPolls += 1;
         pollTimer = setTimeout(loadReview, 30000);
       } else if (!pending) pendingPolls = 0;
-      review.hidden = rows.length === 0;
       if (!review.hidden && location.hash === '#in-review' && !review.dataset.scrolled) {
         review.dataset.scrolled = '1';
         review.scrollIntoView();
@@ -443,28 +613,39 @@
         : `Could not load submissions from GitHub (${err.message}).`;
     }
   }
-  document.getElementById('review-refresh').addEventListener('click', loadReview);
+  $('review-refresh').addEventListener('click', loadReview);
   document.addEventListener('visibilitychange', () => {
     if (document.visibilityState === 'visible' && Date.now() - lastLoad > 30000) loadReview();
   });
   if (token) setInterval(() => { if (document.visibilityState === 'visible') loadReview(); }, 20000);
 
+  // ---- Start ----
+  // Old #name links opened a pop-up viewer; send them to the skill page instead.
+  function redirectLegacyHash() {
+    const name = decodeURIComponent(location.hash.slice(1));
+    if (name && items.some(p => p.name === name)) { location.replace(`skill.html?name=${encodeURIComponent(name)}`); return true; }
+    return false;
+  }
+
+  readUrl();
+  $('q').value = state.q;
   fetch('catalog.json', { cache: 'no-cache' })
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     .then(data => {
-      plugins = data.plugins || [];
-      repo = data.repo || null;
-      document.getElementById('add-cmd').textContent = data.addMarketplace;
+      catalog = data;
+      items = data.plugins || [];
+      if (redirectLegacyHash()) return;
+      $('add-cmd').textContent = data.addMarketplace;
       if (data.repo) {
-        document.getElementById('footer').innerHTML =
-          `Source of truth: <a href="https://github.com/${esc(data.repo)}">${esc(data.repo)}</a>. A personal lab, not production.`;
+        $('footer').innerHTML = `Source of truth: <a href="https://github.com/${esc(data.repo)}">${esc(data.repo)}</a>. A personal lab, not production.`;
       }
+      renderShelves();
       render();
-      redirectLegacyHash();
+      if (location.hash === '#browse') $('browse').scrollIntoView({ behavior: 'instant' });
       loadReview();
     })
     .catch(err => {
-      grid.innerHTML = `<p class="state error">Could not load catalog.json (${esc(err.message)}).</p>`;
+      $('shelf-slots').innerHTML = `<p class="state error">Could not load catalog.json (${esc(err.message)}).</p>`;
     });
 })();
 </script>

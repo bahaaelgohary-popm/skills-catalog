@@ -1,0 +1,14 @@
+{
+  "name": "code-review-checklist",
+  "version": "0.1.0",
+  "description": "Review a change against a practical checklist and report findings by severity",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "code-review",
+    "quality",
+    "security"
+  ]
+}

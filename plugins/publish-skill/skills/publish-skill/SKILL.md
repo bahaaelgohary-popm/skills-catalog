@@ -19,6 +19,8 @@ Ask for anything not already given, in a single question:
 | Owner | Free text, a person or handle. Required. |
 | Tags | Optional, comma-separated. Suggest 2–4 from the SKILL.md content. |
 | Use it when | One line. Suggest one from the SKILL.md description. |
+| Jobs | One or more of: `plan` (Plan and spec work), `review` (Review code), `ship` (Ship a release), `meetings` (Run meetings and standups), `incidents` (Handle an incident), `maintain` (Keep a repo healthy), `share` (Share a skill). Suggest from the content. |
+| Works with | One or more of: `chat` (Chat only), `files` (Local files), `git`, `github`, `terminal`. Suggest from what the skill reads or runs. |
 | Catalog repo | Default `<gh login>/skills-catalog`, from `gh api user --jq .login`. |
 
 There is no tier to choose: every new skill starts as `Experimental`, and a reviewer promotes it to `Recommended` in a later PR.
@@ -44,7 +46,7 @@ If `plugins/<name>` already exists on `main`, stop and ask whether this should b
 From the clone root, run the repository's helper. It runs the same checks as the web publisher (naming, size limits, secrets), copies the folder to `plugins/<name>/skills/<name>/`, writes `plugin.json` and `catalog.yaml` (tier `Experimental`), and appends the marketplace entry:
 
 ```bash
-node scripts/new-plugin.mjs --from "<skill folder>" --name <name> --owner "<owner>" --tags "<a,b,c>" --use-it-when "<one line>" --description "<one line>"
+node scripts/new-plugin.mjs --from "<skill folder>" --name <name> --owner "<owner>" --tags "<a,b,c>" --jobs "<ids>" --works-with "<ids>" --use-it-when "<one line>" --description "<one line>"
 ```
 
 ## 4. Validate

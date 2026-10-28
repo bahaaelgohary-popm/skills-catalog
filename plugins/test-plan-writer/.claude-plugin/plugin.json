@@ -1,0 +1,14 @@
+{
+  "name": "test-plan-writer",
+  "version": "0.1.0",
+  "description": "Write a risk-based test plan with cases by level, test data and exit criteria",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "testing",
+    "quality",
+    "release"
+  ]
+}

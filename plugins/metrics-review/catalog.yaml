@@ -1,4 +1,6 @@
 owner: Bahaa
 tier: Experimental
 tags: [product, metrics, kpi, guardrails]
+jobs: [plan]
+works_with: [chat]
 use_it_when: You are about to adopt or report a metric and want to know how it could be gamed.

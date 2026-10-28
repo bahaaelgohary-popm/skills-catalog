@@ -1,4 +1,6 @@
 owner: Bahaa
 tier: Recommended
 tags: [git, changelog, release, docs]
+jobs: [ship]
+works_with: [git]
 use_it_when: You are cutting a release and need notes your users can read, not a commit dump.
