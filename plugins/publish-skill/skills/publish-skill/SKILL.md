@@ -27,7 +27,7 @@ There is no tier to choose: every new skill starts as `Experimental`, and a revi
 
 Read the `SKILL.md`. The plugin name is its frontmatter `name`, or the folder name if absent. It must be kebab-case (`a-z`, `0-9`, `-`). If not, propose a kebab-case name and confirm it.
 
-Stop and tell the user if: `gh auth status` fails, `git` or `node` is missing, or the folder contains anything that looks like a secret (API keys, tokens, `.env` files, private keys).
+Stop and tell the user if: `gh auth status` fails, `git` or `node` is missing, `git config user.email` is empty (git would otherwise publish the operating system account name and email; ask them to set their GitHub noreply address with `git config --global`), or the folder contains anything that looks like a secret (API keys, tokens, `.env` files, private keys).
 
 ## 2. Prepare a clean checkout
 
