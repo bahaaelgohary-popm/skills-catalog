@@ -22,13 +22,19 @@ const existing = baseNames();
 // must raise its version. catalog.yaml is catalog data (tier, tags), not part of what users run.
 const BASE = process.env.CATALOG_BASE || 'origin/main';
 const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+// One diff for the whole plugins/ folder, grouped by plugin, so the cost doesn't grow with the catalog.
+const changedByPlugin = new Map();
+try {
+  for (const f of git('diff', '--name-only', BASE, '--', 'plugins').split('\n').filter(Boolean)) {
+    const name = f.split('/')[1];
+    changedByPlugin.set(name, [...(changedByPlugin.get(name) || []), f]);
+  }
+} catch {}
 function versionNotBumped(name, version) {
-  if (!existing?.has(name)) return null;
-  let changed, before;
-  try {
-    changed = git('diff', '--name-only', BASE, '--', `plugins/${name}`).split('\n');
-    before = JSON.parse(git('show', `${BASE}:plugins/${name}/.claude-plugin/plugin.json`)).version;
-  } catch { return null; }
+  const changed = changedByPlugin.get(name);
+  if (!existing?.has(name) || !changed) return null;
+  let before;
+  try { before = JSON.parse(git('show', `${BASE}:plugins/${name}/.claude-plugin/plugin.json`)).version; } catch { return null; }
   return versionBumpProblem({ changed, before, version });
 }
 
