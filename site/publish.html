@@ -32,6 +32,7 @@
   .lead { margin: 0 0 20px; color: var(--text-secondary); }
   h2 { margin: 0 0 12px; color: var(--text-primary); font-size: 14px; font-weight: 600; }
   h3 { margin: 16px 0 8px; color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .notice { margin: 0 0 16px; padding: 10px 12px; background: var(--warning-bg); border: 1px solid #f2d9a6; border-radius: var(--radius-control); color: var(--warning); font-size: 13px; }
   .fine { margin: 8px 0 0; color: var(--text-muted); font-size: 12px; }
 
   .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; min-width: 0; }
@@ -210,6 +211,8 @@
   <a class="back" href="./">← Skills Marketplace</a>
   <h1>Publish a skill</h1>
   <p class="lead">Every way of publishing opens a pull request. Checks run on it. If they pass and the skill bundles no code, it merges automatically and appears in the marketplace as <strong>Experimental</strong> within a few minutes. Skills that run code wait for a reviewer.</p>
+
+  <p class="notice">This is a lab version: publishing is limited to the owner's account for now. You can still try the editor, the upload and the pre-publish checks; only the final step needs access to the repository.</p>
 
   <section class="panel" aria-labelledby="gh-title">
     <div class="gh-row">
