@@ -183,10 +183,12 @@
     .pr-status { grid-row: auto; grid-column: auto; justify-self: start; }
     .bar-right label { display: none; }
   }
+  .ai-note { margin: 0 0 16px; padding: 8px 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-control); color: var(--text-secondary); font-size: 12px; }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <p class="ai-note" role="note">Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.</p>
   <header>
     <div class="topbar">
       <div>
@@ -201,7 +203,7 @@
       <h3>Tiers</h3>
       <dl>
         <dt><span class="badge badge-Experimental">Experimental</span></dt><dd>Every new item starts here once automated checks pass. Items with no bundled code merge automatically; items that run code or pre-approve tools beyond reading files are merged by a reviewer.</dd>
-        <dt><span class="badge badge-Recommended">Recommended</span></dt><dd>Promoted by a reviewer once it has proven useful.</dd>
+        <dt><span class="badge badge-Recommended">Recommended</span></dt><dd>Marked ready to use by the catalog owner, in a later pull request.</dd>
       </dl>
       <h3>What it can do</h3>
       <dl>
@@ -397,7 +399,7 @@
   function renderShelves() {
     const live = items.filter(p => !p.stale && !p.deprecated);
     const shelves = [
-      { id: 'recommended', title: 'Recommended', sub: 'Promoted by reviewers after they proved useful', list: live.filter(p => p.tier === 'Recommended').sort((a, b) => a.name.localeCompare(b.name)), see: { tier: ['Recommended'] } },
+      { id: 'recommended', title: 'Recommended', sub: 'Marked ready to use by the catalog owner', list: live.filter(p => p.tier === 'Recommended').sort((a, b) => a.name.localeCompare(b.name)), see: { tier: ['Recommended'] } },
       { id: 'new', title: 'New and experimental', sub: 'Passed automated checks, looking for early users', list: live.filter(p => p.tier === 'Experimental').sort((a, b) => time(b.addedAt) - time(a.addedAt)), see: { tier: ['Experimental'], sort: 'newest' } },
       { id: 'updated', title: 'Recently updated', sub: 'Latest changes across the marketplace', list: [...live].sort((a, b) => time(b.lastUpdated) - time(a.lastUpdated)), see: { sort: 'updated' } },
     ];

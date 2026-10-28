@@ -117,10 +117,12 @@
     .browser { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 560px; }
     .tree { max-height: 180px; border-right: 0; border-bottom: 1px solid var(--divider); }
   }
+  .ai-note { margin: 0 0 16px; padding: 8px 12px; background: var(--bg-subtle); border: 1px solid var(--border); border-radius: var(--radius-control); color: var(--text-secondary); font-size: 12px; }
 </style>
 </head>
 <body>
 <div class="wrap">
+  <p class="ai-note" role="note">Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.</p>
   <a class="back" href="./">← Skills Marketplace</a>
   <main id="main"><p class="state">Loading…</p></main>
 </div>
@@ -219,7 +221,7 @@
             <h2 id="h-tier">About the tier</h2>
             <div class="tier-note">
               <p><span class="badge badge-Experimental">Experimental</span> Every new skill starts here, after automated checks and a reviewer's merge.</p>
-              <p><span class="badge badge-Recommended">Recommended</span> Promoted by a reviewer once it has proven useful.</p>
+              <p><span class="badge badge-Recommended">Recommended</span> Marked ready to use by the catalog owner, in a later pull request.</p>
             </div>
           </section>
 

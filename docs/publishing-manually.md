@@ -1,5 +1,8 @@
 # Publishing a skill manually
 
+> [!NOTE]
+> Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.
+
 How to write a skill in Claude Code, test it, and publish it to this catalog from your terminal. The examples use a skill called `my-skill`; replace it with your own name.
 
 **Don't want to clone the repo?** Two quicker routes do the same thing:
