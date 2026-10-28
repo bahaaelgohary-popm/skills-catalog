@@ -163,10 +163,15 @@ export function buildPluginFiles({ name, description, owner, tags = [], useItWhe
   ];
 }
 
+// Inserts the entry in alphabetical position, and never after the last entry, so the change is only
+// added lines: two publishes that land in different places merge without a conflict.
 export function addMarketplaceEntry(marketText, { name, description }) {
   const market = JSON.parse(marketText);
-  if (market.plugins.some(p => p.name === name)) throw new Error(`"${name}" is already in marketplace.json`);
-  market.plugins.push({ name, source: `./plugins/${name}`, description });
+  const list = market.plugins;
+  if (list.some(p => p.name === name)) throw new Error(`"${name}" is already in marketplace.json`);
+  const next = list.findIndex(p => p.name.localeCompare(name) > 0);
+  const at = next >= 0 ? next : Math.max(list.length - 1, 0);
+  list.splice(at, 0, { name, source: `./plugins/${name}`, description });
   return JSON.stringify(market, null, 2) + '\n';
 }
 
