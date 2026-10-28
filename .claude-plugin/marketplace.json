@@ -59,6 +59,11 @@
       "name": "incident-postmortem",
       "source": "./plugins/incident-postmortem",
       "description": "Blameless incident postmortems: a writer skill plus a timeline-builder agent that turns messy logs into a clean timeline"
+    },
+    {
+      "name": "retro-facilitator",
+      "source": "./plugins/retro-facilitator",
+      "description": "Run a team retrospective from raw notes or sticky-note dumps, grouping themes and turning them into a few owned improvement actions. Use after a sprint, project or incident when a team wants to reflect and improve."
     }
   ]
 }

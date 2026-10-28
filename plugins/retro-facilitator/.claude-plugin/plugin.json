@@ -1,0 +1,10 @@
+{
+  "name": "retro-facilitator",
+  "version": "0.1.0",
+  "description": "Run a team retrospective from raw notes or sticky-note dumps, grouping themes and turning them into a few owned improvement actions. Use after a sprint, project or incident when a team wants to reflect and improve.",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": []
+}
