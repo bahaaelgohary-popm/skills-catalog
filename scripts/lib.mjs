@@ -62,7 +62,13 @@ export function isNewerVersion(a, b) {
   for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
   return false;
 }
-export const nextPatch = (v) => { const [a = 0, b = 0, c = 0] = String(v).split(/[.+-]/).map(Number); return `${a}.${b}.${c + 1}`; };
+// The version rule: files of an existing plugin changed (catalog.yaml aside) but the version did not go up.
+// changed: paths changed since the base branch; before: version on the base branch. Returns the problem or null.
+export function versionBumpProblem({ changed, before, version }) {
+  const files = changed.filter(f => f && !f.endsWith('/catalog.yaml') && f !== 'catalog.yaml');
+  return files.length && !isNewerVersion(version, before) ? { before, changed: files } : null;
+}
+export const nextPatch =(v) => { const [a = 0, b = 0, c = 0] = String(v).split(/[.+-]/).map(Number); return `${a}.${b}.${c + 1}`; };
 
 // The publisher's api(method, path) interface over the gh CLI (GH_TOKEN in Actions, your login locally).
 export function ghApi(method, path) {

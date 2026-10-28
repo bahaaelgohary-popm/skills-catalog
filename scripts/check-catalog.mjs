@@ -4,7 +4,7 @@
 // Base branch: $CATALOG_BASE (default origin/main); the "new plugin" rule is skipped if it can't be read.
 import { readdirSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { ROOT, MARKETPLACE, TIERS, NEW_TIER, NAME_RE, JOBS, WORKS_WITH, readJson, readYaml, pluginDir, existsSync, join, isNewerVersion } from './lib.mjs';
+import { ROOT, MARKETPLACE, TIERS, NEW_TIER, NAME_RE, JOBS, WORKS_WITH, readJson, readYaml, pluginDir, existsSync, join, versionBumpProblem } from './lib.mjs';
 
 const errors = [];
 const fail = (msg) => errors.push(msg);
@@ -26,10 +26,10 @@ function versionNotBumped(name, version) {
   if (!existing?.has(name)) return null;
   let changed, before;
   try {
-    changed = git('diff', '--name-only', BASE, '--', `plugins/${name}`).split('\n').filter(f => f && !f.endsWith('/catalog.yaml'));
+    changed = git('diff', '--name-only', BASE, '--', `plugins/${name}`).split('\n');
     before = JSON.parse(git('show', `${BASE}:plugins/${name}/.claude-plugin/plugin.json`)).version;
   } catch { return null; }
-  return changed.length && !isNewerVersion(version, before) ? { before, changed } : null;
+  return versionBumpProblem({ changed, before, version });
 }
 
 const market = readJson(MARKETPLACE);
