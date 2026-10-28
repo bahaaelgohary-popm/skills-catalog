@@ -2,7 +2,7 @@
 
 A small catalog of generic Claude Code skills, each packaged as a plugin in a plugin marketplace. This repository is the source of truth: a GitHub Action checks every change, generates `catalog.json`, and publishes a searchable page to GitHub Pages.
 
-> A personal lab, not production.
+> A personal lab, not production. [Roadmap](docs/roadmap.md): analytics, publishing for anyone, other agents, and putting this front end on an existing registry.
 
 **Catalog page:** https://bahaaelgohary-popm.github.io/skills-catalog/
 
@@ -38,6 +38,7 @@ plugins/<name>/
   catalog.yaml                      catalog-only metadata: owner, tier, tags, jobs, works_with, use_it_when
 scripts/                            check-catalog, build-catalog, new-plugin (plain Node, no deps)
 tests/                              node:test unit tests for the publisher, auto-merge rules and versions
+docs/                               publishing guide and roadmap
 site/index.html                     the marketplace: search, "I want to…", shelves, In review, Browse all with filters
 site/skill.html                     one page per skill: install, what it can do, files, version history
 site/publish.html                   the web publisher (editor and upload)
