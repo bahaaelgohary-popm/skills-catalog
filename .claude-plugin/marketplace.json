@@ -46,6 +46,11 @@
       "description": "Publish a skill to this catalog through a pull request"
     },
     {
+      "name": "release-notes-checker",
+      "source": "./plugins/release-notes-checker",
+      "description": "Check draft release notes before publishing, for missing breaking changes, unclear wording, internal jargon and inconsistent formatting."
+    },
+    {
       "name": "repo-health-check",
       "source": "./plugins/repo-health-check",
       "description": "Check a repository for missing basics, large files, stale branches and open TODOs"
