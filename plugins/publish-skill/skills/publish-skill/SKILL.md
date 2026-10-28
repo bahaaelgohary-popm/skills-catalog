@@ -17,10 +17,11 @@ Ask for anything not already given, in a single question:
 |---|---|
 | Skill folder | `$ARGUMENTS` if given. Must contain `SKILL.md`. |
 | Owner | Free text, a person or handle. Required. |
-| Lifecycle | `Pilot` or `GA`. Default `Pilot`. |
 | Tags | Optional, comma-separated. Suggest 2–4 from the SKILL.md content. |
 | Use it when | One line. Suggest one from the SKILL.md description. |
 | Catalog repo | Default `<gh login>/skills-catalog`, from `gh api user --jq .login`. |
+
+There is no tier to choose: every new skill starts as `Experimental`, and a reviewer promotes it to `Recommended` in a later PR.
 
 Read the `SKILL.md`. The plugin name is its frontmatter `name`, or the folder name if absent. It must be kebab-case (`a-z`, `0-9`, `-`). If not, propose a kebab-case name and confirm it.
 
@@ -40,10 +41,10 @@ If `plugins/<name>` already exists on `main`, stop and ask whether this should b
 
 ## 3. Add the plugin
 
-From the clone root, run the repository's helper, which copies the folder to `plugins/<name>/skills/<name>/`, writes `plugin.json` and `catalog.yaml`, and appends the marketplace entry:
+From the clone root, run the repository's helper. It runs the same checks as the web publisher (naming, size limits, secrets), copies the folder to `plugins/<name>/skills/<name>/`, writes `plugin.json` and `catalog.yaml` (tier `Experimental`), and appends the marketplace entry:
 
 ```bash
-node scripts/new-plugin.mjs --from "<skill folder>" --name <name> --owner "<owner>" --lifecycle <Pilot|GA> --tags "<a,b,c>" --use-it-when "<one line>" --description "<one line>"
+node scripts/new-plugin.mjs --from "<skill folder>" --name <name> --owner "<owner>" --tags "<a,b,c>" --use-it-when "<one line>" --description "<one line>"
 ```
 
 ## 4. Validate
@@ -64,7 +65,7 @@ git push -u origin add-skill/<name>
 gh pr create --base main --head add-skill/<name> --title "Add <name> skill" --body "<body>"
 ```
 
-The PR body lists: what the skill does, owner, lifecycle, tags, and a checklist — `[x] claude plugin validate --strict passed`, `[x] catalog checks passed`, `[ ] reviewer tried the skill`.
+The PR body lists: what the skill does, owner, tier (Experimental), tags, and a checklist — `[x] claude plugin validate --strict passed`, `[x] catalog checks passed`, `[ ] reviewer tried the skill`.
 
 ## 6. Report
 

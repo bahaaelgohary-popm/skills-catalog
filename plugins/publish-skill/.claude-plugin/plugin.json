@@ -1,6 +1,6 @@
 {
   "name": "publish-skill",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Publish a local skill folder to the skills-catalog marketplace through a pull request",
   "author": {
     "name": "Bahaa"

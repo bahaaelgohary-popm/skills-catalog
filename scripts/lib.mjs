@@ -5,7 +5,8 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const MARKETPLACE = join(ROOT, '.claude-plugin', 'marketplace.json');
-export const LIFECYCLES = ['Pilot', 'GA'];
+export const TIERS = ['Experimental', 'Recommended'];
+export const NEW_TIER = 'Experimental'; // every newly published plugin starts here
 export const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
 
 export function readJson(path) {

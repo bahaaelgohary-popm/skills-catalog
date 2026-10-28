@@ -1,10 +1,22 @@
 // Catalog checks that `claude plugin validate` does not cover:
-// every plugin has catalog.yaml with owner + lifecycle, names match, nothing is orphaned.
+// every plugin has catalog.yaml with owner + tier, names match, nothing is orphaned,
+// and plugins that are new compared to the base branch start as Experimental.
+// Base branch: $CATALOG_BASE (default origin/main); the "new plugin" rule is skipped if it can't be read.
 import { readdirSync, statSync } from 'node:fs';
-import { ROOT, MARKETPLACE, LIFECYCLES, NAME_RE, readJson, readYaml, pluginDir, existsSync, join } from './lib.mjs';
+import { execFileSync } from 'node:child_process';
+import { ROOT, MARKETPLACE, TIERS, NEW_TIER, NAME_RE, readJson, readYaml, pluginDir, existsSync, join } from './lib.mjs';
 
 const errors = [];
 const fail = (msg) => errors.push(msg);
+
+function baseNames() {
+  try {
+    const text = execFileSync('git', ['show', `${process.env.CATALOG_BASE || 'origin/main'}:.claude-plugin/marketplace.json`],
+      { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    return new Set(JSON.parse(text).plugins.map(p => p.name));
+  } catch { return null; }
+}
+const existing = baseNames();
 
 const market = readJson(MARKETPLACE);
 if (market.name !== 'skills-catalog') fail(`marketplace name must be "skills-catalog", got "${market.name}"`);
@@ -41,7 +53,8 @@ for (const [i, entry] of (market.plugins || []).entries()) {
   let meta;
   try { meta = readYaml(catalogPath); } catch (e) { fail(`${at}: catalog.yaml ${e.message}`); continue; }
   if (!meta.owner) fail(`${at}: catalog.yaml needs owner`);
-  if (!LIFECYCLES.includes(meta.lifecycle)) fail(`${at}: catalog.yaml lifecycle must be one of ${LIFECYCLES.join(', ')}, got "${meta.lifecycle}"`);
+  if (!TIERS.includes(meta.tier)) fail(`${at}: catalog.yaml tier must be one of ${TIERS.join(', ')}, got "${meta.tier}"`);
+  else if (existing && !existing.has(entry.name) && meta.tier !== NEW_TIER) fail(`${at}: new plugins start as ${NEW_TIER}; promote in a later PR`);
   if (!meta.use_it_when) fail(`${at}: catalog.yaml needs use_it_when`);
   if (meta.tags !== undefined && !Array.isArray(meta.tags)) fail(`${at}: catalog.yaml tags must be a list`);
 }

@@ -58,7 +58,7 @@ const plugins = market.plugins.map(entry => {
     description: manifest.description || entry.description || '',
     version: manifest.version || null,
     owner: meta.owner,
-    lifecycle: meta.lifecycle,
+    tier: meta.tier,
     tags: meta.tags || [],
     useItWhen: meta.use_it_when || '',
     lastUpdated: git('log', '-1', '--format=%cI', '--', entry.source) || null,

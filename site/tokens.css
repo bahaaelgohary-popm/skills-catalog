@@ -1,0 +1,47 @@
+/* Design tokens shared by the catalog and publish pages. Pages use these variables and nothing else. */
+:root {
+  color-scheme: light;
+  --font-text: "Geist", system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+
+  --bg-page: #fbfbfa;
+  --bg-card: #ffffff;
+  --bg-subtle: #f3f2ef;
+  --bg-subtle-hover: #f6f5f3;
+
+  --text-primary: #1a1a1a;
+  --text-body: #3b3a37;
+  --text-secondary: #55534f;
+  --text-muted: #6b6b6b;
+  --text-faint: #8a8780;
+
+  --border: #e7e5e2;
+  --divider: #f1f0ed;
+  --border-inactive: #c9c6bf;
+
+  --accent: #FF5100;
+  --accent-strong: #E64900;
+  --accent-soft-bg: #FFF1EB;
+  --accent-soft-border: #FFCBB2;
+
+  --success: #1f7a46;
+  --success-bg: #eef7f1;
+  --warning: #8a5a00;
+  --warning-bg: #fbf6e6;
+  --alert: #c2410c;
+
+  --recommended-text: #1f7a46;
+  --recommended-bg: #eef7f1;
+  --recommended-border: #bfe0cb;
+  --experimental-text: #8a5a00;
+  --experimental-bg: #fbf6e6;
+  --experimental-border: #f2d9a6;
+
+  --code-bg: #1a1a1a;
+  --code-text: #e7e5e2;
+  --on-accent: #ffffff;
+
+  --radius-card: 12px;
+  --radius-control: 8px;
+  --radius-badge: 4px;
+}

@@ -1,51 +1,45 @@
 // Wrap a skill folder as a plugin in this catalog. Used by the publish-skill skill.
-// node scripts/new-plugin.mjs --from <dir> --name <name> --owner <owner>
-//   [--lifecycle Pilot|GA] [--tags a,b] [--use-it-when "..."] [--description "..."]
-import { cpSync, mkdirSync, writeFileSync, readFileSync } from 'node:fs';
-import { resolve } from 'node:path';
-import { ROOT, MARKETPLACE, LIFECYCLES, NAME_RE, readJson, existsSync, join } from './lib.mjs';
+// Shares file generation and checks with the web Publish page (site/publish-core.mjs).
+// node scripts/new-plugin.mjs --from <dir> --owner <owner> [--name <name>] [--tags a,b]
+//   [--use-it-when "..."] [--description "..."]
+// New plugins always start as Experimental.
+import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
+import { resolve, dirname, relative } from 'node:path';
+import { ROOT, MARKETPLACE, readJson, existsSync, join } from './lib.mjs';
+import { normalizeUpload, parseFrontmatter, runChecks, buildPluginFiles, addMarketplaceEntry, bytesToText, tagsFrom, NEW_TIER } from '../site/publish-core.mjs';
 
 const args = {};
-for (let i = 2; i < process.argv.length; i += 2) {
-  args[process.argv[i].replace(/^--/, '')] = process.argv[i + 1];
-}
-
+for (let i = 2; i < process.argv.length; i += 2) args[process.argv[i].replace(/^--/, '')] = process.argv[i + 1];
 const die = (msg) => { console.error(`✘ ${msg}`); process.exit(1); };
-const from = args.from && resolve(args.from);
-const name = args.name;
-const owner = args.owner;
-const lifecycle = args.lifecycle || 'Pilot';
 
-if (!from || !existsSync(join(from, 'SKILL.md'))) die('--from must be a folder containing SKILL.md');
-if (!NAME_RE.test(name || '')) die('--name must be kebab-case');
-if (!owner) die('--owner is required');
-if (!LIFECYCLES.includes(lifecycle)) die(`--lifecycle must be one of ${LIFECYCLES.join(', ')}`);
+const from = args.from && resolve(args.from);
+if (!from || !existsSync(from)) die('--from must be a skill folder');
+
+const walk = (dir) => readdirSync(dir, { withFileTypes: true }).flatMap(d =>
+  d.isDirectory() ? walk(join(dir, d.name)) : d.isFile() ? [join(dir, d.name)] : []);
+const upload = normalizeUpload(walk(from).map(p => ({ path: relative(from, p), bytes: new Uint8Array(readFileSync(p)) })));
+if (upload.error) die(upload.error);
+
+const fm = parseFrontmatter(bytesToText(upload.files.find(f => f.path === 'SKILL.md').bytes)).fields;
+const name = args.name || fm.name;
+const description = args.description || fm.description;
+const plugin = {
+  name,
+  description,
+  owner: args.owner,
+  tags: tagsFrom(args.tags),
+  useItWhen: args['use-it-when'] || description,
+  files: upload.files,
+};
 
 const market = readJson(MARKETPLACE);
-if (market.plugins.some(p => p.name === name)) die(`"${name}" is already in marketplace.json`);
-const dest = join(ROOT, 'plugins', name);
-if (existsSync(dest)) die(`plugins/${name} already exists`);
+const failed = runChecks({ ...plugin, existingNames: market.plugins.map(p => p.name) }).filter(c => !c.ok);
+if (failed.length) die(`Checks failed:\n${failed.map(c => `  - ${c.label}${c.detail ? `: ${c.detail}` : ''}`).join('\n')}`);
+if (existsSync(join(ROOT, 'plugins', name))) die(`plugins/${name} already exists`);
 
-// Fall back to the SKILL.md frontmatter description.
-const skillText = readFileSync(join(from, 'SKILL.md'), 'utf8');
-const fmDescription = (skillText.match(/^---[\s\S]*?^description:\s*(.+)$[\s\S]*?^---/m) || [])[1];
-const description = args.description || fmDescription || name;
-const tags = (args.tags || '').split(',').map(t => t.trim()).filter(Boolean);
-const q = (s) => JSON.stringify(s);
-
-cpSync(from, join(dest, 'skills', name), { recursive: true });
-mkdirSync(join(dest, '.claude-plugin'), { recursive: true });
-writeFileSync(join(dest, '.claude-plugin', 'plugin.json'), JSON.stringify({
-  name,
-  version: '0.1.0',
-  description,
-  author: { name: owner },
-  license: 'MIT',
-  keywords: tags,
-}, null, 2) + '\n');
-writeFileSync(join(dest, 'catalog.yaml'),
-  `owner: ${q(owner)}\nlifecycle: ${lifecycle}\ntags: [${tags.join(', ')}]\nuse_it_when: ${q(args['use-it-when'] || description)}\n`);
-
-market.plugins.push({ name, source: `./plugins/${name}`, description });
-writeFileSync(MARKETPLACE, JSON.stringify(market, null, 2) + '\n');
-console.log(`✔ Added plugins/${name} (${lifecycle}) and its marketplace entry`);
+for (const f of buildPluginFiles(plugin)) {
+  mkdirSync(dirname(join(ROOT, f.path)), { recursive: true });
+  writeFileSync(join(ROOT, f.path), f.bytes);
+}
+writeFileSync(MARKETPLACE, addMarketplaceEntry(readFileSync(MARKETPLACE, 'utf8'), plugin));
+console.log(`✔ Added plugins/${name} (${NEW_TIER}) and its marketplace entry`);

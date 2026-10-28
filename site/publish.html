@@ -1,0 +1,575 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Publish a Skill</title>
+<meta name="description" content="Publish a Claude Code skill to the catalog through a pull request.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body {
+    margin: 0;
+    background: var(--bg-page);
+    color: var(--text-body);
+    font-family: var(--font-text);
+    font-size: 14px;
+    line-height: 1.55;
+    overflow-x: hidden;
+  }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 16px 64px; }
+  .mono { font-family: var(--font-mono); }
+  [hidden] { display: none !important; }
+  a { color: var(--text-secondary); }
+
+  .back { display: inline-block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; text-decoration: none; }
+  .back:hover { color: var(--text-primary); }
+  h1 { margin: 0 0 4px; color: var(--text-primary); font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; }
+  .lead { margin: 0 0 20px; color: var(--text-secondary); }
+  h2 { margin: 0 0 12px; color: var(--text-primary); font-size: 14px; font-weight: 600; }
+  h3 { margin: 16px 0 8px; color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .fine { margin: 8px 0 0; color: var(--text-muted); font-size: 12px; }
+
+  .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; min-width: 0; }
+
+  button { font: inherit; cursor: pointer; }
+  button:disabled { cursor: not-allowed; }
+  :focus-visible { outline: 2px solid var(--accent-soft-border); outline-offset: 2px; }
+  .btn-primary {
+    border: 1px solid var(--accent-strong);
+    background: var(--accent-strong);
+    color: var(--on-accent);
+    font-size: 14px;
+    font-weight: 700;
+    border-radius: var(--radius-control);
+    padding: 9px 16px;
+  }
+  .btn-primary:hover:not(:disabled), .btn-primary:active:not(:disabled) { outline: 1px solid var(--accent-strong); outline-offset: 1px; }
+  .btn-primary:disabled { background: var(--bg-subtle); border-color: var(--border); color: var(--text-faint); }
+  .btn-secondary {
+    border: 1px solid var(--border);
+    background: var(--bg-subtle);
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    border-radius: var(--radius-control);
+    padding: 6px 12px;
+    white-space: nowrap;
+  }
+  .btn-secondary:hover { background: var(--bg-subtle-hover); }
+  .btn-link { border: 0; background: none; padding: 0; color: var(--text-secondary); font-size: 13px; text-decoration: underline; }
+  .copied, .copied:hover { background: var(--success-bg); border-color: var(--recommended-border); color: var(--success); }
+
+  input[type="text"], input[type="password"], textarea {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--bg-card);
+    color: var(--text-primary);
+    font: inherit;
+  }
+  input[type="text"], input[type="password"] { height: 36px; padding: 0 12px; }
+  input::placeholder, textarea::placeholder { color: var(--text-faint); }
+  input:focus, textarea:focus { outline: none; border-color: var(--accent-soft-border); box-shadow: 0 0 0 3px var(--accent-soft-bg); }
+
+  /* GitHub connection */
+  .gh-row { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; }
+  .gh-row form { display: flex; gap: 8px; flex: 1 1 320px; min-width: 0; }
+  .gh-state { color: var(--text-secondary); }
+  .gh-state strong { color: var(--text-primary); }
+  .dot { display: inline-block; width: 8px; height: 8px; margin-right: 6px; border-radius: 50%; background: var(--border-inactive); vertical-align: 1px; }
+  .dot.on { background: var(--success); }
+  details { margin-top: 10px; font-size: 13px; color: var(--text-secondary); }
+  summary { cursor: pointer; color: var(--text-secondary); }
+  details ol { margin: 8px 0 0; padding-left: 20px; }
+  .error-text { margin: 8px 0 0; color: var(--alert); font-size: 13px; }
+
+  /* Tabs */
+  .tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 24px 0 16px; }
+  .tab {
+    height: 36px;
+    padding: 0 14px;
+    border: 1px solid var(--border-inactive);
+    border-radius: var(--radius-control);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 500;
+  }
+  .tab:hover { background: var(--bg-subtle-hover); }
+  .tab[aria-selected="true"] { background: var(--accent-strong); border-color: var(--accent-strong); color: var(--on-accent); font-weight: 700; }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 340px; gap: 16px; align-items: start; }
+  .col-main { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .layout.single { grid-template-columns: minmax(0, 1fr); }
+
+  /* Editor */
+  .editor-head { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+  .editor-head label { color: var(--text-primary); font-weight: 600; }
+  textarea#editor {
+    display: block;
+    min-height: 440px;
+    padding: 12px 14px;
+    resize: vertical;
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    tab-size: 2;
+  }
+
+  /* Upload */
+  .drop {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    padding: 32px 16px;
+    border: 1px dashed var(--border-inactive);
+    border-radius: var(--radius-card);
+    background: var(--bg-subtle);
+    text-align: center;
+  }
+  .drop.over { border-color: var(--accent-soft-border); background: var(--accent-soft-bg); }
+  .drop strong { color: var(--text-primary); font-size: 14px; }
+  .drop p { margin: 0; color: var(--text-muted); font-size: 13px; }
+  .drop-buttons { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+  .notes { margin: 12px 0 0; padding: 0; list-style: none; font-size: 13px; color: var(--text-secondary); }
+  .notes li.bad { color: var(--alert); }
+
+  /* Details form */
+  .fields { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; }
+  .field { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+  .field.full { grid-column: 1 / -1; }
+  .field label, .field .label { color: var(--text-muted); font-size: 12px; font-weight: 500; }
+  .field output { min-height: 22px; color: var(--text-primary); overflow-wrap: anywhere; }
+  .field output.empty { color: var(--text-faint); }
+  .badge { display: inline-block; padding: 1px 7px; border: 1px solid; border-radius: var(--radius-badge); font-size: 12px; font-weight: 600; }
+  .badge-Experimental { color: var(--experimental-text); background: var(--experimental-bg); border-color: var(--experimental-border); }
+  .tier-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; color: var(--text-muted); font-size: 12px; }
+
+  /* Review */
+  .review { position: sticky; top: 16px; }
+  .files { margin: 0; padding: 10px 12px; border-radius: var(--radius-control); background: var(--bg-page); border: 1px solid var(--divider); list-style: none; font-family: var(--font-mono); font-size: 12px; color: var(--text-body); overflow-wrap: anywhere; }
+  .files li.root { color: var(--text-primary); font-weight: 500; }
+  .files li.sub { padding-left: 14px; }
+  .files li.dim { margin-top: 4px; color: var(--text-faint); }
+  .checks { margin: 0; padding: 0; list-style: none; font-size: 13px; }
+  .checks li { display: grid; grid-template-columns: 18px minmax(0, 1fr); gap: 6px; padding: 3px 0; }
+  .checks .mark { font-weight: 700; }
+  .checks .ok .mark { color: var(--success); }
+  .checks .bad .mark { color: var(--alert); }
+  .checks .wait .mark { color: var(--text-faint); }
+  .checks .detail { display: block; color: var(--text-muted); font-size: 12px; overflow-wrap: anywhere; }
+  .publish-row { margin-top: 16px; }
+  .publish-row .btn-primary { width: 100%; }
+  .progress { margin: 12px 0 0; padding: 0; list-style: none; font-size: 13px; }
+  .progress li { padding: 2px 0; color: var(--text-muted); }
+  .progress li.run { color: var(--text-primary); }
+  .progress li.done { color: var(--success); }
+  .result { margin-top: 12px; padding: 12px; border-radius: var(--radius-control); font-size: 13px; overflow-wrap: anywhere; }
+  .result.ok { background: var(--success-bg); border: 1px solid var(--recommended-border); color: var(--text-body); }
+  .result.ok a { color: var(--success); font-weight: 600; }
+  .result.err { background: var(--bg-card); border: 1px solid var(--alert); color: var(--alert); }
+  .result ol { margin: 8px 0 0; padding-left: 18px; }
+
+  /* Claude Code tab */
+  .steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 16px; }
+  .steps > li { counter-increment: s; }
+  .steps > li > p { margin: 0 0 8px; color: var(--text-primary); }
+  .steps > li > p::before { content: counter(s) ". "; color: var(--text-muted); }
+  .cmd { display: flex; align-items: center; gap: 12px; background: var(--code-bg); color: var(--code-text); border-radius: var(--radius-control); padding: 10px 10px 10px 14px; }
+  .cmd code { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .cmd .btn-secondary { background: var(--bg-card); }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+    .review { position: static; }
+  }
+  @media (max-width: 520px) {
+    .wrap { padding-top: 20px; }
+    .fields { grid-template-columns: minmax(0, 1fr); }
+    .gh-row form { flex-basis: 100%; }
+    .tab { flex: 1 1 auto; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← Skills Catalog</a>
+  <h1>Publish a skill</h1>
+  <p class="lead">Every way of publishing opens a pull request. Checks run on it, a reviewer merges it, and the skill appears in the catalog as <strong>Experimental</strong>.</p>
+
+  <section class="panel" aria-labelledby="gh-title">
+    <div class="gh-row">
+      <div class="gh-state" id="gh-title"><span class="dot" id="gh-dot"></span><span id="gh-status">GitHub not connected</span></div>
+      <form id="gh-form" autocomplete="off">
+        <input type="password" id="gh-token" placeholder="Paste a fine-grained GitHub token" aria-label="GitHub token" spellcheck="false">
+        <button class="btn-secondary" type="submit">Connect</button>
+      </form>
+      <button class="btn-link" type="button" id="gh-disconnect" hidden>Disconnect</button>
+    </div>
+    <p class="error-text" id="gh-error" hidden></p>
+    <details>
+      <summary>How to create the token</summary>
+      <ol>
+        <li>Open <a href="https://github.com/settings/personal-access-tokens/new" target="_blank" rel="noopener">GitHub › Fine-grained tokens › Generate new token</a>.</li>
+        <li>Repository access: <strong>Only select repositories</strong> › <span class="mono" id="repo-name">this catalog's repository</span>.</li>
+        <li>Permissions: <strong>Contents</strong> Read and write, <strong>Pull requests</strong> Read and write.</li>
+        <li>Generate, copy, paste it above.</li>
+      </ol>
+    </details>
+    <p class="fine">The token stays in this browser tab only (cleared when you close it) and is sent only to api.github.com.</p>
+  </section>
+
+  <div class="tabs" role="tablist" aria-label="How to publish">
+    <button class="tab" role="tab" type="button" data-mode="write" aria-selected="true" aria-controls="tab-write">Write in the editor</button>
+    <button class="tab" role="tab" type="button" data-mode="upload" aria-selected="false" aria-controls="tab-upload">Upload files or a zip</button>
+    <button class="tab" role="tab" type="button" data-mode="cli" aria-selected="false" aria-controls="tab-cli">From Claude Code</button>
+  </div>
+
+  <div class="layout" id="layout">
+    <div class="col-main">
+      <section class="panel" id="tab-write" role="tabpanel">
+        <div class="editor-head">
+          <label for="editor">SKILL.md</label>
+          <button class="btn-link" type="button" id="reset-template">Start from the template</button>
+        </div>
+        <textarea id="editor" spellcheck="false" aria-describedby="editor-hint"></textarea>
+        <p class="fine" id="editor-hint">The frontmatter's <span class="mono">name</span> and <span class="mono">description</span> become the plugin name and description. Need reference files or scripts too? Use “Upload files or a zip”.</p>
+      </section>
+
+      <section class="panel" id="tab-upload" role="tabpanel" hidden>
+        <div class="drop" id="drop">
+          <strong>Drop a skill folder, its files, or a .zip here</strong>
+          <p>SKILL.md at the root, references and scripts in subfolders. Up to 100 files, 5 MB.</p>
+          <div class="drop-buttons">
+            <button class="btn-secondary" type="button" data-pick="pick-files">Choose files</button>
+            <button class="btn-secondary" type="button" data-pick="pick-folder">Choose a folder</button>
+            <button class="btn-secondary" type="button" data-pick="pick-zip">Choose a .zip</button>
+          </div>
+          <input type="file" id="pick-files" multiple hidden>
+          <input type="file" id="pick-folder" webkitdirectory multiple hidden>
+          <input type="file" id="pick-zip" accept=".zip,application/zip" hidden>
+        </div>
+        <ul class="notes" id="upload-notes"></ul>
+      </section>
+
+      <section class="panel" id="tab-cli" role="tabpanel" hidden>
+        <h2>Publish from a Claude Code session</h2>
+        <ol class="steps">
+          <li><p>Add this marketplace (once)</p><div class="cmd"><code id="cli-add">claude plugin marketplace add …</code><button class="btn-secondary" type="button" data-copy-target="cli-add">Copy</button></div></li>
+          <li><p>Install the publisher</p><div class="cmd"><code id="cli-install">claude plugin install publish-skill@skills-catalog</code><button class="btn-secondary" type="button" data-copy-target="cli-install">Copy</button></div></li>
+          <li><p>In any session, point it at your skill folder</p><div class="cmd"><code id="cli-run">/publish-skill:publish-skill ./path/to/my-skill</code><button class="btn-secondary" type="button" data-copy-target="cli-run">Copy</button></div></li>
+        </ol>
+        <p class="fine">It asks for the owner, runs the same checks as this page, and opens the pull request with the GitHub CLI. It needs git, node and a logged-in <span class="mono">gh</span>. Prefer doing it by hand? See <a id="manual-link" href="#">Publishing a skill manually</a>.</p>
+      </section>
+
+      <section class="panel" id="details">
+        <h2>Details</h2>
+        <div class="fields">
+          <div class="field"><span class="label">Name (from SKILL.md)</span><output id="out-name" class="mono"></output></div>
+          <div class="field"><span class="label">Tier</span><div class="tier-row"><span class="badge badge-Experimental">Experimental</span><span>All new skills start here. A reviewer promotes to Recommended later.</span></div></div>
+          <div class="field full"><span class="label">Description (from SKILL.md)</span><output id="out-desc"></output></div>
+          <div class="field"><label for="in-owner">Owner</label><input type="text" id="in-owner" placeholder="Person or team"></div>
+          <div class="field"><label for="in-tags">Tags</label><input type="text" id="in-tags" placeholder="comma, separated"></div>
+          <div class="field full"><label for="in-use">Use it when</label><input type="text" id="in-use" placeholder="One line on when to reach for this skill"></div>
+        </div>
+      </section>
+    </div>
+
+    <aside class="review" id="review">
+      <section class="panel" aria-labelledby="review-title">
+        <h2 id="review-title">Review</h2>
+        <h3>Pull request will add</h3>
+        <ul class="files" id="files"></ul>
+        <h3>Checks</h3>
+        <ul class="checks" id="checks"></ul>
+        <div class="publish-row">
+          <button class="btn-primary" type="button" id="publish" disabled>Open pull request</button>
+          <p class="fine" id="publish-hint"></p>
+        </div>
+        <ol class="progress" id="progress" hidden></ol>
+        <div class="result" id="result" hidden></div>
+      </section>
+    </aside>
+  </div>
+</div>
+
+<script type="module">
+import * as core from './publish-core.mjs';
+
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const store = {
+  get(area, k) { try { return window[area].getItem(k); } catch { return null; } },
+  set(area, k, v) { try { v == null ? window[area].removeItem(k) : window[area].setItem(k, v); } catch {} },
+};
+
+const state = { mode: 'write', upload: { files: [], notes: [] }, token: null, login: null, repo: null, existing: [], busy: false, done: false };
+
+// ---- GitHub ----
+async function api(method, path, body) {
+  const res = await fetch(`https://api.github.com${path}`, {
+    method,
+    headers: {
+      Accept: 'application/vnd.github+json',
+      Authorization: `Bearer ${state.token}`,
+      'X-GitHub-Api-Version': '2022-11-28',
+      ...(body ? { 'Content-Type': 'application/json' } : {}),
+    },
+    body: body ? JSON.stringify(body) : undefined,
+  });
+  let data = null;
+  try { data = await res.json(); } catch {}
+  return { status: res.status, data };
+}
+
+async function connect(token) {
+  $('gh-error').hidden = true;
+  state.token = token;
+  const me = await api('GET', '/user').catch(() => ({ status: 0 }));
+  if (me.status !== 200) {
+    state.token = null;
+    store.set('sessionStorage', 'gh-token', null);
+    $('gh-error').textContent = me.status === 401 ? 'GitHub rejected this token.' : 'Could not reach GitHub.';
+    $('gh-error').hidden = false;
+    return renderConnection();
+  }
+  state.login = me.data.login;
+  store.set('sessionStorage', 'gh-token', token);
+  renderConnection();
+}
+
+function renderConnection() {
+  const on = !!state.login;
+  $('gh-dot').classList.toggle('on', on);
+  $('gh-status').innerHTML = on ? `Connected as <strong>@${esc(state.login)}</strong>` : 'GitHub not connected';
+  $('gh-form').hidden = on;
+  $('gh-disconnect').hidden = !on;
+  refresh();
+}
+
+$('gh-form').addEventListener('submit', (e) => {
+  e.preventDefault();
+  const t = $('gh-token').value.trim();
+  $('gh-token').value = '';
+  if (t) connect(t);
+});
+$('gh-disconnect').addEventListener('click', () => {
+  state.token = state.login = null;
+  store.set('sessionStorage', 'gh-token', null);
+  renderConnection();
+});
+
+// ---- Tabs ----
+const tabs = [...document.querySelectorAll('.tab')];
+tabs.forEach(t => t.addEventListener('click', () => setMode(t.dataset.mode)));
+function setMode(mode) {
+  state.mode = mode;
+  tabs.forEach(t => t.setAttribute('aria-selected', String(t.dataset.mode === mode)));
+  $('tab-write').hidden = mode !== 'write';
+  $('tab-upload').hidden = mode !== 'upload';
+  $('tab-cli').hidden = mode !== 'cli';
+  $('details').hidden = mode === 'cli';
+  $('review').hidden = mode === 'cli';
+  $('layout').classList.toggle('single', mode === 'cli');
+  store.set('localStorage', 'publish-mode', mode);
+  refresh();
+}
+
+// ---- Editor ----
+const editor = $('editor');
+editor.value = store.get('localStorage', 'publish-draft') || core.skillTemplate();
+$('reset-template').addEventListener('click', () => { editor.value = core.skillTemplate(); onInput(); });
+let timer;
+function onInput() {
+  clearTimeout(timer);
+  timer = setTimeout(() => { store.set('localStorage', 'publish-draft', editor.value); refresh(); }, 150);
+}
+editor.addEventListener('input', onInput);
+
+// ---- Upload ----
+const drop = $('drop');
+document.querySelectorAll('[data-pick]').forEach(b => b.addEventListener('click', () => $(b.dataset.pick).click()));
+$('pick-files').addEventListener('change', (e) => takeFiles([...e.target.files].map(f => ({ path: f.name, file: f }))));
+$('pick-folder').addEventListener('change', (e) => takeFiles([...e.target.files].map(f => ({ path: f.webkitRelativePath || f.name, file: f }))));
+$('pick-zip').addEventListener('change', (e) => takeFiles([...e.target.files].map(f => ({ path: f.name, file: f }))));
+['dragenter', 'dragover'].forEach(ev => drop.addEventListener(ev, (e) => { e.preventDefault(); drop.classList.add('over'); }));
+['dragleave', 'drop'].forEach(ev => drop.addEventListener(ev, () => drop.classList.remove('over')));
+drop.addEventListener('drop', async (e) => {
+  e.preventDefault();
+  const entries = [...e.dataTransfer.items].map(i => i.webkitGetAsEntry?.()).filter(Boolean);
+  const out = [];
+  if (entries.length) for (const en of entries) await walkEntry(en, '', out);
+  else for (const f of e.dataTransfer.files) out.push({ path: f.name, file: f });
+  takeFiles(out);
+});
+async function walkEntry(entry, prefix, out) {
+  if (entry.isFile) {
+    out.push({ path: prefix + entry.name, file: await new Promise((res, rej) => entry.file(res, rej)) });
+  } else if (entry.isDirectory) {
+    const reader = entry.createReader();
+    for (;;) {
+      const batch = await new Promise((res, rej) => reader.readEntries(res, rej));
+      if (!batch.length) break;
+      for (const child of batch) await walkEntry(child, `${prefix}${entry.name}/`, out);
+    }
+  }
+}
+
+// Exposed for tests: takes [{ path, file: Blob }] exactly like the pickers do.
+async function takeFiles(list) {
+  const notes = [];
+  try {
+    const total = list.reduce((n, x) => n + x.file.size, 0);
+    if (total > 20 * 1024 * 1024) throw new Error('That upload is over 20 MB. A skill folder should be much smaller.');
+    let entries;
+    if (list.length === 1 && /\.zip$/i.test(list[0].path)) {
+      const { unzipSync } = await import('https://cdn.jsdelivr.net/npm/fflate@0.8.2/esm/browser.js');
+      const unzipped = unzipSync(new Uint8Array(await list[0].file.arrayBuffer()));
+      entries = Object.entries(unzipped).map(([path, bytes]) => ({ path, bytes }));
+      notes.push(`Unzipped ${list[0].path}: ${entries.filter(e => !e.path.endsWith('/')).length} entries.`);
+    } else {
+      entries = await Promise.all(list.map(async x => ({ path: x.path, bytes: new Uint8Array(await x.file.arrayBuffer()) })));
+    }
+    const r = core.normalizeUpload(entries);
+    if (r.error) throw new Error(r.error);
+    state.upload = { files: r.files, notes: [...notes, ...r.notes] };
+  } catch (err) {
+    state.upload = { files: [], notes: [...notes, { bad: err.message }] };
+  }
+  $('pick-files').value = $('pick-folder').value = $('pick-zip').value = '';
+  refresh();
+}
+window.__takeFiles = takeFiles;
+
+// ---- Details ----
+for (const id of ['in-owner', 'in-tags', 'in-use']) {
+  const el = $(id);
+  el.value = store.get('localStorage', `publish-${id}`) || '';
+  el.addEventListener('input', () => { store.set('localStorage', `publish-${id}`, el.value); refresh(); });
+}
+
+function currentPlugin() {
+  const files = state.mode === 'write' ? [{ path: 'SKILL.md', bytes: core.textToBytes(editor.value) }] : state.upload.files;
+  const skill = files.find(f => f.path === 'SKILL.md');
+  const fm = skill ? core.parseFrontmatter(core.bytesToText(skill.bytes)).fields : {};
+  return {
+    name: fm.name || '',
+    description: fm.description || '',
+    owner: $('in-owner').value.trim(),
+    tags: core.tagsFrom($('in-tags').value),
+    useItWhen: $('in-use').value.trim(),
+    files,
+  };
+}
+
+// ---- Review ----
+function refresh() {
+  if (state.mode === 'cli') return;
+  const p = currentPlugin();
+  const setOut = (el, v, empty) => { el.textContent = v || empty; el.classList.toggle('empty', !v); };
+  setOut($('out-name'), p.name, 'Set name: in SKILL.md');
+  setOut($('out-desc'), p.description, 'Set description: in SKILL.md');
+
+  $('upload-notes').innerHTML = state.upload.notes.map(n => typeof n === 'string' ? `<li>${esc(n)}</li>` : `<li class="bad">${esc(n.bad)}</li>`).join('');
+
+  const name = p.name || '<name>';
+  const fileRows = p.files.length
+    ? ['.claude-plugin/plugin.json', 'catalog.yaml', ...p.files.map(f => `skills/${name}/${f.path}`)]
+    : [];
+  $('files').innerHTML = fileRows.length
+    ? `<li class="root">plugins/${esc(name)}/</li>` + fileRows.map(r => `<li class="sub">${esc(r)}</li>`).join('') +
+      `<li class="dim">+ entry in .claude-plugin/marketplace.json</li>`
+    : `<li class="dim">${state.mode === 'upload' ? 'Nothing uploaded yet' : 'Write SKILL.md to see the files'}</li>`;
+
+  const checks = p.files.length ? core.runChecks({ ...p, existingNames: state.existing }) : [{ ok: false, label: 'A skill to publish', detail: state.mode === 'upload' ? 'Upload a skill folder or zip' : '' }];
+  checks.push({ ok: !!state.login, label: 'Connected to GitHub', detail: state.login ? '' : 'Paste a token above' });
+  $('checks').innerHTML = checks.map(c => `<li class="${c.ok ? 'ok' : 'bad'}"><span class="mark">${c.ok ? '✓' : '✕'}</span><span>${esc(c.label)}${c.detail ? `<span class="detail">${esc(c.detail)}</span>` : ''}</span></li>`).join('');
+
+  const ready = checks.every(c => c.ok) && !state.busy;
+  $('publish').disabled = !ready;
+  const failing = checks.filter(c => !c.ok).length;
+  $('publish-hint').textContent = state.busy ? 'Working…' : ready
+    ? `Opens a pull request on ${state.repo}. Nothing is published until it is reviewed and merged.`
+    : `${failing} check${failing === 1 ? '' : 's'} to fix before publishing.`;
+}
+
+$('publish').addEventListener('click', async () => {
+  const plugin = currentPlugin();
+  state.busy = true;
+  refresh();
+  const progress = $('progress');
+  const steps = new Map();
+  progress.innerHTML = '';
+  progress.hidden = false;
+  $('result').hidden = true;
+  try {
+    const pr = await core.publishToGitHub({
+      api,
+      repo: state.repo,
+      plugin,
+      via: state.mode === 'write' ? 'from the web editor' : 'by upload on the web publisher',
+      onStep: (label, status) => {
+        if (!steps.has(label)) { const li = document.createElement('li'); progress.appendChild(li); steps.set(label, li); }
+        const li = steps.get(label);
+        li.className = status;
+        li.textContent = `${status === 'done' ? '✓' : '…'} ${label}`;
+      },
+    });
+    state.existing.push(plugin.name);
+    showResult(true, `<strong>Pull request <a href="${esc(pr.url)}" target="_blank" rel="noopener">#${pr.number}</a> is open.</strong>
+      <ol><li>Checks run on it (validation, catalog rules, secret scan).</li><li>A reviewer merges it.</li><li>The catalog page updates within a couple of minutes.</li></ol>`);
+    if (state.mode === 'write') store.set('localStorage', 'publish-draft', null);
+  } catch (err) {
+    showResult(false, `Publishing failed: ${esc(err.message)}`);
+  } finally {
+    state.busy = false;
+    refresh();
+  }
+});
+function showResult(ok, html) {
+  const r = $('result');
+  r.className = `result ${ok ? 'ok' : 'err'}`;
+  r.innerHTML = html;
+  r.hidden = false;
+}
+
+// ---- Copy buttons ----
+document.addEventListener('click', async (e) => {
+  const btn = e.target.closest('[data-copy-target]');
+  if (!btn) return;
+  const text = $(btn.dataset.copyTarget).textContent;
+  try { await navigator.clipboard.writeText(text); } catch {
+    const ta = Object.assign(document.createElement('textarea'), { value: text });
+    document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+  }
+  btn.textContent = 'Copied'; btn.classList.add('copied');
+  setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+});
+
+// ---- Start ----
+fetch('catalog.json', { cache: 'no-cache' })
+  .then(r => r.json())
+  .then(c => {
+    state.repo = c.repo;
+    state.existing = c.plugins.map(p => p.name);
+    $('cli-add').textContent = c.addMarketplace;
+    $('cli-install').textContent = `claude plugin install publish-skill@${c.marketplace}`;
+    $('repo-name').textContent = c.repo;
+    $('manual-link').href = `https://github.com/${c.repo}/blob/main/docs/publishing-manually.md`;
+  })
+  .catch(() => showResult(false, 'Could not load catalog.json, so the repository is unknown.'))
+  .finally(() => {
+    setMode(store.get('localStorage', 'publish-mode') || 'write');
+    const saved = store.get('sessionStorage', 'gh-token');
+    if (saved) connect(saved); else renderConnection();
+  });
+</script>
+</body>
+</html>

@@ -42,7 +42,7 @@ Rules:
 - The first line must be exactly `---`, with nothing before it.
 - `name` is kebab-case (`a-z`, `0-9`, `-`) and matches the folder name.
 - `description` leads with what the skill does, then when to use it. Claude uses it to decide when to load the skill.
-- Keep frontmatter to `name` and `description`. Claude Code options such as `disable-model-invocation` or `argument-hint` are fine. **Do not put catalog metadata (owner, lifecycle, tags) here**; it goes in `catalog.yaml`.
+- Keep frontmatter to `name` and `description`. Claude Code options such as `disable-model-invocation` or `argument-hint` are fine. **Do not put catalog metadata (owner, tier, tags) here**; it goes in `catalog.yaml`.
 - Write concrete instructions and an output format, not general advice. Stay under ~500 lines.
 - Never include secrets, internal hostnames or company-specific details.
 
@@ -82,7 +82,7 @@ plugins/my-skill/
 **Shortcut:** the helper script does steps 5a–5d in one command:
 
 ```bash
-node scripts/new-plugin.mjs --from ~/.claude/skills/my-skill --name my-skill --owner "Your Name" --lifecycle Pilot --tags "tag1,tag2" --use-it-when "One line on when to reach for it."
+node scripts/new-plugin.mjs --from ~/.claude/skills/my-skill --name my-skill --owner "Your Name" --tags "tag1,tag2" --use-it-when "One line on when to reach for it."
 ```
 
 Or by hand:
@@ -113,12 +113,12 @@ PowerShell: `mkdir plugins\my-skill\.claude-plugin` then `Copy-Item -Recurse "$H
 
 ```yaml
 owner: Your Name
-lifecycle: Pilot
+tier: Experimental
 tags: [tag1, tag2]
 use_it_when: One line on when to reach for it.
 ```
 
-New skills start as `Pilot`. Promote to `GA` later with a one-line PR.
+New skills must start as `Experimental` (CI enforces this). A reviewer promotes a skill to `Recommended` later with a one-line PR.
 
 **5d. Add an entry at the end of `plugins` in `.claude-plugin/marketplace.json`**
 
@@ -154,7 +154,7 @@ Run `/my-skill:my-skill`. Plugin skills always carry the `plugin:skill` prefix.
 git add plugins/my-skill .claude-plugin/marketplace.json
 git commit -m "Add my-skill skill"
 git push -u origin add-skill/my-skill
-gh pr create --base main --title "Add my-skill skill" --body "Owner: Your Name. Lifecycle: Pilot. Validated locally."
+gh pr create --base main --title "Add my-skill skill" --body "Owner: Your Name. Tier: Experimental. Validated locally."
 ```
 
 ### 9. Wait for checks, review, merge
@@ -175,15 +175,16 @@ claude plugin install my-skill@skills-catalog
 
 ## Updating a published skill
 
-Same flow: branch, edit, PR. **Always bump `version` in `plugin.json`** (for example `0.1.0` → `0.2.0`); installed copies stay on their version until it changes. To promote a skill, change `lifecycle: Pilot` to `GA` in `catalog.yaml`.
+Same flow: branch, edit, PR. **Always bump `version` in `plugin.json`** (for example `0.1.0` → `0.2.0`); installed copies stay on their version until it changes. To promote a skill, change `tier: Experimental` to `Recommended` in `catalog.yaml`.
 
 ## When a check fails
 
 | Error | Fix |
 |---|---|
 | `plugin.json name "x" does not match marketplace entry` | Make the folder, `plugin.json` name and marketplace entry name identical |
-| `missing catalog.yaml` or `needs owner` | Add `catalog.yaml` with `owner`, `lifecycle`, `use_it_when` |
-| `lifecycle must be one of Pilot, GA` | Values are case-sensitive: `Pilot` or `GA` |
+| `missing catalog.yaml` or `needs owner` | Add `catalog.yaml` with `owner`, `tier`, `use_it_when` |
+| `tier must be one of Experimental, Recommended` | Values are case-sensitive |
+| `new plugins start as Experimental` | Set `tier: Experimental`; promote in a later PR |
 | `plugins/x is not listed in marketplace.json` | Add the marketplace entry (step 5d) |
 | `Unknown field` warning fails `--strict` | Remove catalog fields from `SKILL.md` frontmatter or `plugin.json` |
 | `Invalid JSON syntax` | Usually a missing or extra comma in `marketplace.json` |

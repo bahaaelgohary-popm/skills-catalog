@@ -40,7 +40,7 @@ jobs:
       - name: Generate catalog.json
         run: |
           mkdir -p _site
-          cp site/index.html _site/
+          cp site/* _site/
           node scripts/build-catalog.mjs _site
           cat _site/catalog.json
 

@@ -8,54 +8,8 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
 <style>
-  :root {
-    color-scheme: light;
-    --font-text: "Geist", system-ui, sans-serif;
-    --font-mono: "Geist Mono", ui-monospace, monospace;
-
-    --bg-page: #fbfbfa;
-    --bg-card: #ffffff;
-    --bg-subtle: #f3f2ef;
-    --bg-subtle-hover: #f6f5f3;
-
-    --text-primary: #1a1a1a;
-    --text-body: #3b3a37;
-    --text-secondary: #55534f;
-    --text-muted: #6b6b6b;
-    --text-faint: #8a8780;
-
-    --border: #e7e5e2;
-    --divider: #f1f0ed;
-    --border-inactive: #c9c6bf;
-
-    --accent: #FF5100;
-    --accent-strong: #E64900;
-    --accent-soft-bg: #FFF1EB;
-    --accent-soft-border: #FFCBB2;
-
-    --success: #1f7a46;
-    --success-bg: #eef7f1;
-    --warning: #8a5a00;
-    --warning-bg: #fbf6e6;
-    --alert: #c2410c;
-
-    --ga-text: #1f7a46;
-    --ga-bg: #eef7f1;
-    --ga-border: #bfe0cb;
-    --pilot-text: #8a5a00;
-    --pilot-bg: #fbf6e6;
-    --pilot-border: #f2d9a6;
-
-    --code-bg: #1a1a1a;
-    --code-text: #e7e5e2;
-    --on-accent: #ffffff;
-
-    --radius-card: 12px;
-    --radius-control: 8px;
-    --radius-badge: 4px;
-  }
-
   *, *::before, *::after { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; }
   body {
@@ -78,6 +32,8 @@
     line-height: 1.25;
   }
   header p { margin: 0 0 20px; color: var(--text-secondary); }
+  .topbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px; }
+  a.btn-secondary { display: inline-block; text-decoration: none; }
 
   .panel {
     background: var(--bg-card);
@@ -130,7 +86,7 @@
   }
   .btn-secondary:hover { background: var(--bg-subtle-hover); }
 
-  .copied, .copied:hover { background: var(--success-bg); border-color: var(--ga-border); color: var(--success); outline: none; }
+  .copied, .copied:hover { background: var(--success-bg); border-color: var(--recommended-border); color: var(--success); outline: none; }
 
   :focus-visible { outline: 2px solid var(--accent-soft-border); outline-offset: 2px; }
 
@@ -194,8 +150,8 @@
     font-size: 12px;
     font-weight: 600;
   }
-  .badge-GA { color: var(--ga-text); background: var(--ga-bg); border-color: var(--ga-border); }
-  .badge-Pilot { color: var(--pilot-text); background: var(--pilot-bg); border-color: var(--pilot-border); }
+  .badge-Recommended { color: var(--recommended-text); background: var(--recommended-bg); border-color: var(--recommended-border); }
+  .badge-Experimental { color: var(--experimental-text); background: var(--experimental-bg); border-color: var(--experimental-border); }
 
   .use-when { margin: 10px 0 4px; color: var(--text-body); font-size: 14px; }
   .use-when strong { color: var(--text-primary); font-weight: 600; }
@@ -333,7 +289,10 @@
 <body>
 <div class="wrap">
   <header>
-    <h1>Skills Catalog</h1>
+    <div class="topbar">
+      <h1>Skills Catalog</h1>
+      <a class="btn-secondary" href="publish.html">Publish a skill</a>
+    </div>
     <p id="tagline">Claude Code skills, each packaged as a plugin you can install.</p>
     <section class="panel" aria-labelledby="add-label">
       <p class="panel-label" id="add-label">Add the marketplace once, then install any skill below.</p>
@@ -347,10 +306,10 @@
   <main>
     <div class="toolbar" role="search">
       <input id="q" class="search" type="search" placeholder="Search by name, description or tag" autocomplete="off" aria-label="Search skills">
-      <div class="filters" role="group" aria-label="Filter by lifecycle">
+      <div class="filters" role="group" aria-label="Filter by tier">
         <button class="filter" type="button" data-filter="all" aria-pressed="true">All</button>
-        <button class="filter" type="button" data-filter="GA" aria-pressed="false">GA</button>
-        <button class="filter" type="button" data-filter="Pilot" aria-pressed="false">Pilot</button>
+        <button class="filter" type="button" data-filter="Recommended" aria-pressed="false">Recommended</button>
+        <button class="filter" type="button" data-filter="Experimental" aria-pressed="false">Experimental</button>
       </div>
     </div>
     <p class="count" id="count" aria-live="polite"></p>
@@ -385,11 +344,11 @@
   const q = document.getElementById('q');
   const filterButtons = [...document.querySelectorAll('.filter')];
   let plugins = [];
-  let lifecycle = 'all';
+  let tier = 'all';
 
   const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
-  const rank = (p) => (p.lifecycle === 'GA' ? 0 : 1);
+  const rank = (p) => (p.tier === 'Recommended' ? 0 : 1);
 
   async function copy(text, btn) {
     try {
@@ -412,7 +371,7 @@
   });
 
   filterButtons.forEach(b => b.addEventListener('click', () => {
-    lifecycle = b.dataset.filter;
+    tier = b.dataset.filter;
     filterButtons.forEach(x => x.setAttribute('aria-pressed', String(x === b)));
     render();
   }));
@@ -428,7 +387,7 @@
     return `<article class="card">
       <div class="card-head">
         <h2><button class="card-open" type="button" data-open="${esc(p.name)}" aria-label="View files of ${esc(p.name)}">${esc(p.name)}</button></h2>
-        <span class="badge badge-${esc(p.lifecycle)}">${esc(p.lifecycle)}</span>
+        <span class="badge badge-${esc(p.tier)}">${esc(p.tier)}</span>
       </div>
       <p class="use-when"><strong>Use it when:</strong> ${esc(p.useItWhen)}</p>
       ${tags ? `<ul class="tags" aria-label="Tags">${tags}</ul>` : ''}
@@ -448,7 +407,7 @@
   function render() {
     const terms = q.value.toLowerCase().split(/\s+/).filter(Boolean);
     const list = plugins
-      .filter(p => lifecycle === 'all' || p.lifecycle === lifecycle)
+      .filter(p => tier === 'all' || p.tier === tier)
       .filter(p => matches(p, terms))
       .sort((a, b) => rank(a) - rank(b) || a.name.localeCompare(b.name));
     count.textContent = `${list.length} of ${plugins.length} skills`;
@@ -527,8 +486,8 @@
   async function openViewer(p) {
     document.getElementById('viewer-title').textContent = p.name;
     const badge = document.getElementById('viewer-badge');
-    badge.textContent = p.lifecycle;
-    badge.className = `badge badge-${p.lifecycle}`;
+    badge.textContent = p.tier;
+    badge.className = `badge badge-${p.tier}`;
     document.getElementById('viewer-path').textContent = p.path;
     document.getElementById('viewer-gh').innerHTML = repo ? ` · ${ghLink(p.path, 'tree', 'Open folder on GitHub')}` : '';
     tree.innerHTML = '<p class="state">Loading files…</p>';

@@ -20,13 +20,9 @@ Then install any skill:
 claude plugin install prd-writer@skills-catalog
 ```
 
-| Plugin | Lifecycle | What it does |
-|---|---|---|
-| `prd-writer` | GA | Turns a rough idea into a one-page PRD |
-| `changelog-from-commits` | GA | Writes a user-facing changelog from git commits |
-| `metrics-review` | Pilot | Reviews a metric and suggests guardrail metrics |
-| `meeting-to-actions` | Pilot | Turns meeting notes into decisions, owners and dates |
-| `publish-skill` | GA | Publishes a new skill to this catalog through a PR |
+Browse everything, with tiers and files, on the catalog page.
+
+**Tiers.** Every new skill starts as **Experimental**. A reviewer promotes it to **Recommended** in a later PR.
 
 ## Layout
 
@@ -35,9 +31,11 @@ claude plugin install prd-writer@skills-catalog
 plugins/<name>/
   .claude-plugin/plugin.json        plugin manifest (name must match the entry)
   skills/<name>/SKILL.md            the skill itself
-  catalog.yaml                      catalog-only metadata: owner, lifecycle, tags, use_it_when
+  catalog.yaml                      catalog-only metadata: owner, tier, tags, use_it_when
 scripts/                            check-catalog, build-catalog, new-plugin (plain Node, no deps)
 site/index.html                     the catalog page (plain HTML/CSS/JS)
+site/publish.html                   the web publisher (editor and upload)
+site/publish-core.mjs               publishing logic shared by the web publisher and new-plugin.mjs
 .github/workflows/catalog.yml       checks + Pages deploy
 ```
 
@@ -45,8 +43,13 @@ Catalog metadata lives in `catalog.yaml`, not in `SKILL.md` frontmatter, so `cla
 
 ## How publishing works
 
-1. **PR.** In any Claude Code session with `publish-skill` installed, run `/publish-skill:publish-skill <path-to-skill-folder>`. It asks for the owner and lifecycle (default Pilot), then clones this repo to a temp folder, adds `plugins/<name>`, writes `plugin.json` and `catalog.yaml`, adds the marketplace entry, validates, and opens a pull request with `gh`. It never pushes to `main`.
-2. **Checks.** The Action runs on the PR: `claude plugin validate --strict`, catalog checks (every plugin has `catalog.yaml` with owner and lifecycle; names match the marketplace entry; no unlisted folders), a gitleaks secret scan, and a test build of `catalog.json`.
+1. **PR.** Three ways in, all ending in a pull request (never a push to `main`):
+   - **From Claude Code:** with `publish-skill` installed, run `/publish-skill:publish-skill <path-to-skill-folder>`. It clones this repo to a temp folder, adds the plugin, validates, and opens the PR with `gh`.
+   - **Web editor:** on the [Publish page](https://bahaaelgohary-popm.github.io/skills-catalog/publish.html), write `SKILL.md` in the browser.
+   - **Web upload:** on the same page, drop loose files, a folder, or a `.zip` with the skill folder inside.
+
+   The web publisher runs the same checks as the CLI in the browser and opens the PR through the GitHub API with a fine-grained token you paste (kept only in that tab; needs Contents and Pull requests read/write on this repo).
+2. **Checks.** The Action runs on the PR: `claude plugin validate --strict`, catalog checks (every plugin has `catalog.yaml` with owner and tier; names match the marketplace entry; no unlisted folders; new plugins start as Experimental), a gitleaks secret scan, and a test build of `catalog.json`.
 3. **Merge.** A reviewer reads the skill and merges.
 4. **Catalog updates.** On `main`, the same Action regenerates `catalog.json` (including each plugin's last commit date) and redeploys the page. Users get the new plugin with `claude plugin marketplace update skills-catalog`.
 
