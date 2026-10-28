@@ -65,6 +65,18 @@ jobs:
         with:
           path: _site
 
+  # Not a required check: times the scripts on 900 generated plugins (never committed) to catch slowdowns.
+  scale:
+    name: Scale check (900 generated plugins)
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: node scripts/scale-check.mjs 900 30
+
   secrets:
     name: Secret scan (gitleaks)
     runs-on: ubuntu-latest

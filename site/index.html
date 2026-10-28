@@ -161,6 +161,7 @@
 
   .state { padding: 32px 16px; text-align: center; color: var(--text-muted); }
   .state.error { color: var(--alert); }
+  .more { display: flex; align-items: center; justify-content: center; gap: 12px; margin-top: 16px; color: var(--text-muted); font-size: 13px; }
   .empty { padding: 40px 16px; border: 1px dashed var(--border-inactive); border-radius: var(--radius-card); text-align: center; color: var(--text-secondary); }
   .empty p { margin: 0 0 8px; }
 
@@ -285,6 +286,7 @@
   let catalog = null;
   let items = [];
   const SHELF_SIZE = 6;
+  const PAGE = 60; // results drawn at a time, so large catalogs stay fast
 
   // ---- Filter state, kept in the URL so "See all" and shared links open the same view ----
   const FACETS = [
@@ -294,7 +296,7 @@
     { key: 'works', title: 'Works with', value: p => p.worksWith || [], label: v => catalog.worksWith.find(w => w.id === v)?.label || v },
     { key: 'owner', title: 'Owner', value: p => [p.owner], label: v => v },
   ];
-  const state = { q: '', job: '', sort: 'best', view: 'grid', all: false, f: Object.fromEntries(FACETS.map(f => [f.key, []])) };
+  const state = { q: '', job: '', sort: 'best', view: 'grid', all: false, limit: PAGE, f: Object.fromEntries(FACETS.map(f => [f.key, []])) };
 
   function readUrl() {
     const u = new URLSearchParams(location.search);
@@ -458,12 +460,17 @@
         <p>${ask ? `<a href="${esc(ask)}" target="_blank" rel="noopener">Ask for it</a> · ` : ''}<button class="btn-link" type="button" data-clear>Clear filters</button>${state.all ? '' : ' · <button class="btn-link" type="button" data-show-old>Include stale and deprecated</button>'}</p></div>`;
       return;
     }
-    $('results').innerHTML = state.view === 'list'
-      ? `<div class="list" role="list"><div class="row head" aria-hidden="true"><span>Name</span><span>Owner</span><span>Labels</span><span>Type</span><span>Updated</span></div>${list.map(row).join('')}</div>`
-      : `<div class="grid">${list.map(card).join('')}</div>`;
+    // Draw one page of results; the count, search and filters still cover the whole list.
+    const shown = list.slice(0, state.limit);
+    const more = list.length - shown.length;
+    $('results').innerHTML = (state.view === 'list'
+      ? `<div class="list" role="list"><div class="row head" aria-hidden="true"><span>Name</span><span>Owner</span><span>Labels</span><span>Type</span><span>Updated</span></div>${shown.map(row).join('')}</div>`
+      : `<div class="grid">${shown.map(card).join('')}</div>`)
+      + (more ? `<div class="more"><button class="btn-secondary" type="button" data-more>Show ${Math.min(more, PAGE)} more</button><span>Showing ${shown.length} of ${list.length}</span></div>` : '');
   }
 
   function render() {
+    state.limit = PAGE;
     $('shelves').hidden = filtering();
     renderJobs();
     renderFacets();
@@ -518,6 +525,7 @@
       return render();
     }
     if (e.target.closest('[data-show-old]')) { state.all = true; return render(); }
+    if (e.target.closest('[data-more]')) { state.limit += PAGE; return renderResults(); }
   });
   $('show-old').addEventListener('click', () => { state.all = !state.all; render(); });
   $('sort').addEventListener('change', () => { state.sort = $('sort').value; render(); });

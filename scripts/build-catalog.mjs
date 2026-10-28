@@ -37,10 +37,20 @@ function git(...args) {
   } catch { return ''; }
 }
 
-// Last 10 commits touching a plugin: { sha, date, subject }.
-function history(source) {
-  const out = git('log', '-10', '--format=%h%x09%cI%x09%s', '--', source);
-  return out ? out.split('\n').map(l => { const [sha, date, ...s] = l.split('\t'); return { sha, date, subject: s.join('\t') }; }) : [];
+// Commits per plugin folder, newest first: { sha, date, subject }. One git log for all of plugins/,
+// so the build doesn't start a git process per plugin.
+function commitsByPlugin() {
+  const byName = new Map();
+  for (const record of git('log', '--format=%x00%h%x09%cI%x09%s', '--name-only', '--', 'plugins').split('\0').filter(Boolean)) {
+    const [header, ...paths] = record.split('\n');
+    const [sha, date, ...s] = header.split('\t');
+    const commit = { sha, date, subject: s.join('\t') };
+    for (const name of new Set(paths.filter(p => p.startsWith('plugins/')).map(p => p.split('/')[1]))) {
+      if (!byName.has(name)) byName.set(name, []);
+      byName.get(name).push(commit);
+    }
+  }
+  return byName;
 }
 
 // owner/repo from CI, else from the origin remote.
@@ -52,6 +62,7 @@ function repoSlug() {
 
 const market = readJson(MARKETPLACE);
 const repo = repoSlug();
+const commits = commitsByPlugin();
 
 mkdirSync(join(outDir, 'files'), { recursive: true });
 
@@ -73,7 +84,8 @@ const plugins = market.plugins.map(entry => {
   const meta = readYaml(join(dir, 'catalog.yaml'));
   const files = listFiles(dir).map(rel => fileEntry(dir, rel));
   writeFileSync(join(outDir, 'files', `${entry.name}.json`), JSON.stringify({ name: entry.name, files }) + '\n');
-  const lastUpdated = git('log', '-1', '--format=%cI', '--', entry.source) || null;
+  const log = commits.get(entry.source.replace(/^\.\/plugins\//, '').split('/')[0]) || [];
+  const lastUpdated = log[0]?.date || null;
   return {
     name: entry.name,
     description: manifest.description || entry.description || '',
@@ -89,11 +101,11 @@ const plugins = market.plugins.map(entry => {
     replacedBy: meta.replaced_by || null,
     stale: !!lastUpdated && (Date.now() - new Date(lastUpdated)) / 86400000 > STALE_DAYS,
     lastUpdated,
-    addedAt: git('log', '--format=%cI', '--', entry.source).split('\n').filter(Boolean).pop() || null,
+    addedAt: log.at(-1)?.date || null,
     path: entry.source.replace(/^\.\//, ''),
     fileCount: files.length,
     capabilities: capabilities(files, manifest, entry.name),
-    history: history(entry.source),
+    history: log.slice(0, 10),
     install: `claude plugin install ${entry.name}@${market.name}`,
   };
 });
