@@ -8,6 +8,10 @@ const LEVELS = {
   code: { rank: 2, label: 'Runs code', summary: 'Includes code that can run on your machine. Read it before installing.' },
 };
 const SCRIPT_EXT = /\.(sh|bash|zsh|ps1|psm1|bat|cmd|py|js|mjs|cjs|ts|rb|pl|php|go|exe)$/i;
+// Tools that only read files; pre-approving these alone still merges automatically.
+export const READ_ONLY_TOOLS = ['Read', 'Grep', 'Glob'];
+// "Read, Grep" / "Read Grep" / "[Read, Bash(git log:*)]" -> ['Read', 'Grep', 'Bash(git log:*)']
+export const toolList = (value) => (value || '').match(/[A-Za-z][\w-]*(\([^)]*\))?/g) || [];
 
 // files: [{ path, content }] relative to the plugin root (content null for binaries); manifest: plugin.json object.
 export function capabilities(files, manifest = {}, pluginName = manifest.name) {
@@ -15,6 +19,7 @@ export function capabilities(files, manifest = {}, pluginName = manifest.name) {
   const raise = (l) => { if (LEVELS[l].rank > LEVELS[level].rank) level = l; };
   const items = [];
   const skills = [];
+  const tools = []; // every pre-approved tool, from skills and commands
 
   for (const f of files.filter(f => /^skills\/[^/]+\/SKILL\.md$/.test(f.path))) {
     const dirName = f.path.split('/')[1];
@@ -24,8 +29,17 @@ export function capabilities(files, manifest = {}, pluginName = manifest.name) {
     skills.push({ name, invocation: `/${pluginName}:${name}`, manualOnly });
     if ('allowed-tools' in fm) {
       raise('tools');
+      tools.push(...toolList(fm['allowed-tools']));
       items.push({ kind: 'tools', title: `Pre-approved tools in ${name}`, detail: fm['allowed-tools'] || 'Listed in the SKILL.md frontmatter' });
     }
+  }
+  // Slash commands can pre-approve tools the same way.
+  for (const f of files.filter(f => /^commands\/.+\.md$/.test(f.path))) {
+    const fm = parseFrontmatter(f.content || '').fields;
+    if (!('allowed-tools' in fm)) continue;
+    raise('tools');
+    tools.push(...toolList(fm['allowed-tools']));
+    items.push({ kind: 'tools', title: `Pre-approved tools in ${f.path}`, detail: fm['allowed-tools'] || 'Listed in the command frontmatter' });
   }
   if (skills.length) {
     items.unshift({
@@ -68,5 +82,5 @@ export function capabilities(files, manifest = {}, pluginName = manifest.name) {
     items.push({ kind: 'code', title: 'Bundled scripts', detail: scripts.map(f => f.path).join(', ') });
   }
 
-  return { level, label: LEVELS[level].label, summary: LEVELS[level].summary, items, skills };
+  return { level, label: LEVELS[level].label, summary: LEVELS[level].summary, items, skills, tools };
 }
