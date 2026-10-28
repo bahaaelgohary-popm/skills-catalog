@@ -1,28 +1,16 @@
 # Publishing a skill manually
 
-How to create a skill in the Claude Code CLI, test it, and publish it to this catalog by hand through a pull request. The `publish-skill` plugin automates Part B; this guide is the manual equivalent.
+How to write a skill in Claude Code, test it, and publish it to this catalog from your terminal. The examples use a skill called `my-skill`; replace it with your own name.
 
-The examples use a skill called `my-skill`. Replace it with your own name everywhere.
+**Don't want to clone the repo?** Two quicker routes do the same thing:
+- Upload your skill folder (or a `.zip` of it) on the [Publish page](https://bahaaelgohary-popm.github.io/skills-catalog/publish.html).
+- In Claude Code, with `publish-skill` installed, run `/publish-skill:publish-skill ~/.claude/skills/my-skill`.
 
-**You need:** Claude Code, git, the GitHub CLI (`gh auth login` done), Node.js 18+, and optionally gitleaks.
+**You need:** Claude Code, git, the GitHub CLI (`gh auth login` done) and Node.js 18+. gitleaks is optional (CI runs it anyway).
 
-Commands are shown for bash (macOS, Linux, Git Bash). PowerShell equivalents are noted where they differ.
+## 1. Write the skill
 
-## Part A: Create and test the skill
-
-### 1. Create the skill folder
-
-Personal skills live in `~/.claude/skills/<name>/`.
-
-```bash
-mkdir -p ~/.claude/skills/my-skill
-```
-
-PowerShell: `mkdir "$HOME\.claude\skills\my-skill"`
-
-### 2. Write `SKILL.md`
-
-Create `~/.claude/skills/my-skill/SKILL.md` in any editor (`code`, `nano`, `notepad`), or ask Claude Code to write it for you. A minimal skill:
+Personal skills live in `~/.claude/skills/<name>/SKILL.md` (Windows: `%USERPROFILE%\.claude\skills\<name>\SKILL.md`). Create the file in any editor, or ask Claude Code to write it for you:
 
 ```markdown
 ---
@@ -37,79 +25,66 @@ description: One sentence on what it does. Use when <the situations or phrases t
 3. <The exact output format.>
 ```
 
-Rules:
+- The first line must be exactly `---`. `name` is kebab-case (`a-z`, `0-9`, `-`) and matches the folder name.
+- `description` says what it does, then when to use it; Claude reads it to decide when to load the skill.
+- Write concrete steps and an output format, not general advice. Stay under ~500 lines.
+- No secrets, internal hostnames or company-specific details. On Windows, check Notepad didn't save `SKILL.md.txt`.
 
-- The first line must be exactly `---`, with nothing before it.
-- `name` is kebab-case (`a-z`, `0-9`, `-`) and matches the folder name.
-- `description` leads with what the skill does, then when to use it. Claude uses it to decide when to load the skill.
-- Keep frontmatter to `name` and `description`. Claude Code options such as `disable-model-invocation` or `argument-hint` are fine. **Do not put catalog metadata (owner, tier, tags) here**; it goes in `catalog.yaml`.
-- Write concrete instructions and an output format, not general advice. Stay under ~500 lines.
-- Never include secrets, internal hostnames or company-specific details.
+## 2. Test it
 
-On Windows, check that Notepad did not save it as `SKILL.md.txt`.
+Run `claude`, then `/my-skill <some input>`. Edit `SKILL.md` and repeat until the output is right.
 
-### 3. Test it
-
-```bash
-claude
-```
-
-In the session, run `/my-skill <some input>`. Edit `SKILL.md` and repeat until the output is right.
-
-## Part B: Publish to the catalog
-
-### 4. Clone the catalog and create a branch
-
-Never work on `main`.
+## 3. Publish with one command
 
 ```bash
 gh repo clone bahaaelgohary-popm/skills-catalog
 cd skills-catalog
-git switch -c add-skill/my-skill
+node scripts/new-plugin.mjs --from ~/.claude/skills/my-skill --owner "Your Name" --jobs plan --works-with chat --pr
 ```
 
-### 5. Add the plugin files
+| Option | Required | Value |
+|---|---|---|
+| `--from` | yes | Your skill folder |
+| `--owner` | yes | Your name |
+| `--jobs` | yes | What it helps with, comma-separated: `plan`, `review`, `ship`, `meetings`, `incidents`, `maintain`, `share` |
+| `--works-with` | yes | What it needs, comma-separated: `chat`, `files`, `git`, `github`, `terminal` |
+| `--use-it-when` | no | One line on when to reach for it (defaults to the description) |
+| `--tags` | no | Comma-separated tags |
+| `--name`, `--description` | no | Override the values in `SKILL.md` |
 
-Each skill is its own plugin:
+With `--pr`, the script:
+1. Creates the branch `add-skill/my-skill` from the latest `main`.
+2. Runs the same checks as the Publish page (name, size limits, secrets) and copies your folder into `plugins/my-skill/`. It also writes `plugin.json` and `catalog.yaml` with the tier set to Experimental, and adds the `marketplace.json` entry.
+3. Runs the checks CI runs: `claude plugin validate --strict`, the catalog checks and gitleaks. A missing tool is skipped, since CI runs it anyway.
+4. Commits, pushes and opens the pull request.
+
+If any check fails, it undoes the branch and nothing is pushed. Fix the problem and run it again. Leave out `--pr` to only write the files, so you can look at them first.
+
+## 4. What happens next
+
+CI runs the checks on the PR. If they pass and the skill bundles no code ("Instructions only" or "Pre-approved tools"), it is **merged automatically** about a minute later. Skills with scripts, hooks or MCP servers wait for a reviewer. The [catalog page](https://bahaaelgohary-popm.github.io/skills-catalog/) updates a minute or two after the merge. Then install it:
+
+```bash
+claude plugin marketplace update skills-catalog
+claude plugin install my-skill@skills-catalog
+```
+
+Run it as `/my-skill:my-skill`; plugin skills always carry the `plugin:skill` prefix. To try the plugin before publishing, run the script without `--pr`, then run `claude --plugin-dir ./plugins/my-skill`.
+
+## Updating a published skill
+
+Branch from `main`, edit the files under `plugins/my-skill/`, and **bump `version` in `.claude-plugin/plugin.json`** (for example `0.1.0` → `0.2.0`). Installed copies stay on their version until it changes. Then commit and open a PR with `gh pr create`. Edits to existing skills always go to a reviewer. To promote a skill, change `tier: Experimental` to `Recommended` in its `catalog.yaml`.
+
+## What the script writes
+
+To do it entirely by hand, create these files and add the entry yourself:
 
 ```
 plugins/my-skill/
-├── .claude-plugin/plugin.json
-├── catalog.yaml
-└── skills/my-skill/SKILL.md
+├── .claude-plugin/plugin.json    {"name": "my-skill", "version": "0.1.0", "description": "...", "author": {"name": "Your Name"}}
+├── catalog.yaml                  see below
+└── skills/my-skill/SKILL.md      your skill folder, copied as is
 ```
-
-**Shortcut:** the helper script does steps 5a–5d in one command:
-
-```bash
-node scripts/new-plugin.mjs --from ~/.claude/skills/my-skill --name my-skill --owner "Your Name" --tags "tag1,tag2" --jobs "plan" --works-with "chat" --use-it-when "One line on when to reach for it."
-```
-
-Or by hand:
-
-**5a. Copy the skill**
-
-```bash
-mkdir -p plugins/my-skill/.claude-plugin plugins/my-skill/skills
-cp -r ~/.claude/skills/my-skill plugins/my-skill/skills/my-skill
-```
-
-PowerShell: `mkdir plugins\my-skill\.claude-plugin` then `Copy-Item -Recurse "$HOME\.claude\skills\my-skill" plugins\my-skill\skills\my-skill`
-
-**5b. `plugins/my-skill/.claude-plugin/plugin.json`**
-
-```json
-{
-  "name": "my-skill",
-  "version": "0.1.0",
-  "description": "One line on what it does",
-  "author": { "name": "Your Name" },
-  "license": "MIT",
-  "keywords": ["tag1", "tag2"]
-}
-```
-
-**5c. `plugins/my-skill/catalog.yaml`**
 
 ```yaml
 owner: Your Name
@@ -120,71 +95,7 @@ works_with: [chat]
 use_it_when: One line on when to reach for it.
 ```
 
-`jobs` (what it helps with) must use ids from: `plan`, `review`, `ship`, `meetings`, `incidents`, `maintain`, `share`. `works_with` must use: `chat`, `files`, `git`, `github`, `terminal`. Both lists are defined in `site/publish-core.mjs` and power the marketplace's "I want to…" chips and "Works with" filter. Optional: `deprecated: true` and `replaced_by: <name>`.
-
-New skills must start as `Experimental` (CI enforces this). A reviewer promotes a skill to `Recommended` later with a one-line PR.
-
-**5d. Add an entry at the end of `plugins` in `.claude-plugin/marketplace.json`**
-
-```json
-{
-  "name": "my-skill",
-  "source": "./plugins/my-skill",
-  "description": "One line on what it does"
-}
-```
-
-The folder name, `plugin.json` `name` and marketplace entry `name` must be identical.
-
-### 6. Run the checks CI will run
-
-```bash
-claude plugin validate . --strict
-node scripts/check-catalog.mjs
-gitleaks dir . --redact
-```
-
-### 7. Test it as a plugin
-
-```bash
-claude --plugin-dir ./plugins/my-skill
-```
-
-Run `/my-skill:my-skill`. Plugin skills always carry the `plugin:skill` prefix.
-
-### 8. Commit, push and open a pull request
-
-```bash
-git add plugins/my-skill .claude-plugin/marketplace.json
-git commit -m "Add my-skill skill"
-git push -u origin add-skill/my-skill
-gh pr create --base main --title "Add my-skill skill" --body "Owner: Your Name. Tier: Experimental. Validated locally."
-```
-
-### 9. Wait for checks and the merge
-
-```bash
-gh pr checks --watch
-```
-
-If the checks pass and the PR only adds your new Experimental plugin with no bundled code, it is merged automatically a minute later. Otherwise (for example the skill includes scripts) a reviewer merges it:
-
-```bash
-gh pr merge --squash --delete-branch
-```
-
-The checks are: plugin validation, catalog checks, gitleaks, and a test build of `catalog.json`. After the merge, the Action on `main` regenerates the catalog and redeploys the [catalog page](https://bahaaelgohary-popm.github.io/skills-catalog/) within a minute or two.
-
-### 10. Install it
-
-```bash
-claude plugin marketplace update skills-catalog
-claude plugin install my-skill@skills-catalog
-```
-
-## Updating a published skill
-
-Same flow: branch, edit, PR. **Always bump `version` in `plugin.json`** (for example `0.1.0` → `0.2.0`); installed copies stay on their version until it changes. To promote a skill, change `tier: Experimental` to `Recommended` in `catalog.yaml`.
+Then add `{"name": "my-skill", "source": "./plugins/my-skill", "description": "..."}` at the end of `plugins` in `.claude-plugin/marketplace.json`. The folder name, the `plugin.json` name and the marketplace entry name must be identical. Keep catalog fields out of `SKILL.md` frontmatter. Optional `catalog.yaml` fields: `deprecated: true` and `replaced_by: <name>`.
 
 ## When a check fails
 
@@ -192,10 +103,11 @@ Same flow: branch, edit, PR. **Always bump `version` in `plugin.json`** (for exa
 |---|---|
 | `plugin.json name "x" does not match marketplace entry` | Make the folder, `plugin.json` name and marketplace entry name identical |
 | `missing catalog.yaml` or `needs owner` | Add `catalog.yaml` with `owner`, `tier`, `jobs`, `works_with`, `use_it_when` |
-| `jobs` / `works_with` must be a non-empty list | Add at least one allowed id (see step 5c) |
-| `tier must be one of Experimental, Recommended` | Values are case-sensitive |
+| Unknown job / `jobs` or `works_with` must be a non-empty list | Use the ids in the options table above |
 | `new plugins start as Experimental` | Set `tier: Experimental`; promote in a later PR |
-| `plugins/x is not listed in marketplace.json` | Add the marketplace entry (step 5d) |
+| `plugins/x is not listed in marketplace.json` | Add the marketplace entry |
 | `Unknown field` warning fails `--strict` | Remove catalog fields from `SKILL.md` frontmatter or `plugin.json` |
 | `Invalid JSON syntax` | Usually a missing or extra comma in `marketplace.json` |
-| Gitleaks finding | Remove the secret and rewrite the branch history before pushing again; rotate the secret |
+| `The checkout has uncommitted changes` | Commit or stash them, or use a fresh clone |
+| `Could not create branch add-skill/x` | A branch with that name exists; delete it or pass `--name` |
+| Gitleaks finding | Remove the secret, rotate it, and run again |
