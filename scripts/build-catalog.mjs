@@ -1,9 +1,11 @@
 // Generate catalog.json from marketplace.json + plugin.json + catalog.yaml + git history,
 // plus files/<plugin>.json with each plugin's file tree and text contents for the viewer.
+// Each plugin also gets its capabilities ("What it can do") and recent commit history.
 // Usage: node scripts/build-catalog.mjs [outDir]   (default: _site)
 import { mkdirSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { ROOT, MARKETPLACE, readJson, readYaml, pluginDir, join } from './lib.mjs';
+import { capabilities } from './capabilities.mjs';
 
 const outDir = join(ROOT, process.argv[2] || '_site');
 const MAX_TEXT_BYTES = 200 * 1024;
@@ -35,6 +37,12 @@ function git(...args) {
   } catch { return ''; }
 }
 
+// Last 10 commits touching a plugin: { sha, date, subject }.
+function history(source) {
+  const out = git('log', '-10', '--format=%h%x09%cI%x09%s', '--', source);
+  return out ? out.split('\n').map(l => { const [sha, date, ...s] = l.split('\t'); return { sha, date, subject: s.join('\t') }; }) : [];
+}
+
 // owner/repo from CI, else from the origin remote.
 function repoSlug() {
   if (process.env.GITHUB_REPOSITORY) return process.env.GITHUB_REPOSITORY;
@@ -64,6 +72,8 @@ const plugins = market.plugins.map(entry => {
     lastUpdated: git('log', '-1', '--format=%cI', '--', entry.source) || null,
     path: entry.source.replace(/^\.\//, ''),
     fileCount: files.length,
+    capabilities: capabilities(files, manifest, entry.name),
+    history: history(entry.source),
     install: `claude plugin install ${entry.name}@${market.name}`,
   };
 });

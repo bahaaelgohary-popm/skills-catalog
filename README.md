@@ -24,6 +24,10 @@ Browse everything, with tiers and files, on the catalog page.
 
 **Tiers.** Every new skill starts as **Experimental**. A reviewer promotes it to **Recommended** in a later PR.
 
+**What it can do.** Each skill is labelled from its files at build time: *Instructions only* (Markdown, no bundled code), *Pre-approved tools* (`allowed-tools` in a SKILL.md), or *Runs code* (scripts, hooks, MCP or language servers, `bin/`). The skill page lists exactly what was found.
+
+**In review.** The catalog shows open publish pull requests and their check status, read live from GitHub's public API, so a new submission is visible seconds after it is published.
+
 ## Layout
 
 ```
@@ -33,7 +37,8 @@ plugins/<name>/
   skills/<name>/SKILL.md            the skill itself
   catalog.yaml                      catalog-only metadata: owner, tier, tags, use_it_when
 scripts/                            check-catalog, build-catalog, new-plugin (plain Node, no deps)
-site/index.html                     the catalog page (plain HTML/CSS/JS)
+site/index.html                     the catalog page, with live "In review" submissions (plain HTML/CSS/JS)
+site/skill.html                     one page per skill: install, what it can do, files, version history
 site/publish.html                   the web publisher (editor and upload)
 site/publish-core.mjs               publishing logic shared by the web publisher and new-plugin.mjs
 .github/workflows/catalog.yml       checks + Pages deploy

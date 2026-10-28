@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Skill · Skills Catalog</title>
+<meta name="description" content="A Claude Code skill in the catalog: what it does, what it can do, its files and history.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="tokens.css">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  body { margin: 0; background: var(--bg-page); color: var(--text-body); font-family: var(--font-text); font-size: 14px; line-height: 1.55; overflow-x: hidden; }
+  .wrap { max-width: 1040px; margin: 0 auto; padding: 32px 16px 64px; }
+  .mono { font-family: var(--font-mono); }
+  [hidden] { display: none !important; }
+  a { color: var(--text-secondary); }
+  :focus-visible { outline: 2px solid var(--accent-soft-border); outline-offset: 2px; }
+  button { font: inherit; cursor: pointer; }
+
+  .back { display: inline-block; margin-bottom: 8px; color: var(--text-muted); font-size: 13px; text-decoration: none; }
+  .back:hover { color: var(--text-primary); }
+  .title-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+  h1 { margin: 0; color: var(--text-primary); font-family: var(--font-mono); font-size: 24px; font-weight: 600; letter-spacing: -0.02em; line-height: 1.25; overflow-wrap: anywhere; }
+  .lead { margin: 8px 0 24px; color: var(--text-secondary); font-size: 14px; }
+  h2 { margin: 0 0 12px; color: var(--text-primary); font-size: 14px; font-weight: 600; }
+
+  .badge { display: inline-block; padding: 1px 7px; border: 1px solid; border-radius: var(--radius-badge); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .badge-Recommended { color: var(--recommended-text); background: var(--recommended-bg); border-color: var(--recommended-border); }
+  .badge-Experimental { color: var(--experimental-text); background: var(--experimental-bg); border-color: var(--experimental-border); }
+  .cap { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; border: 1px solid var(--border); border-radius: var(--radius-badge); background: var(--bg-card); color: var(--text-secondary); font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .cap::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--text-faint); }
+  .cap-instructions::before { background: var(--success); }
+  .cap-tools::before { background: var(--warning); }
+  .cap-code::before { background: var(--alert); }
+
+  .layout { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 16px; align-items: start; }
+  .col { display: flex; flex-direction: column; gap: 16px; min-width: 0; }
+  .panel { background: var(--bg-card); border: 1px solid var(--border); border-radius: var(--radius-card); padding: 16px; min-width: 0; }
+
+  .use-when { margin: 0; color: var(--text-body); font-size: 15px; }
+
+  .steps { margin: 0; padding: 0; list-style: none; counter-reset: s; display: flex; flex-direction: column; gap: 12px; }
+  .steps > li { counter-increment: s; }
+  .steps > li > p { margin: 0 0 6px; color: var(--text-secondary); font-size: 13px; }
+  .steps > li > p:first-child::before { content: counter(s) ". "; color: var(--text-faint); }
+  .cmd { display: flex; align-items: center; gap: 12px; background: var(--code-bg); color: var(--code-text); border-radius: var(--radius-control); padding: 10px 10px 10px 14px; }
+  .cmd code { flex: 1; min-width: 0; font-family: var(--font-mono); font-size: 12px; white-space: pre-wrap; overflow-wrap: anywhere; }
+  .btn-primary { flex: none; border: 1px solid var(--accent-strong); background: var(--accent-strong); color: var(--on-accent); font-size: 13px; font-weight: 700; border-radius: var(--radius-control); padding: 6px 14px; }
+  .btn-primary:hover, .btn-primary:active { outline: 1px solid var(--accent-strong); outline-offset: 1px; }
+  .btn-secondary { flex: none; border: 1px solid var(--border); background: var(--bg-card); color: var(--text-primary); font-size: 13px; font-weight: 700; border-radius: var(--radius-control); padding: 6px 12px; }
+  .btn-secondary:hover { background: var(--bg-subtle-hover); }
+  .copied, .copied:hover { background: var(--success-bg); border-color: var(--recommended-border); color: var(--success); outline: none; }
+  .invoke { margin: 0; color: var(--text-secondary); font-size: 13px; }
+  .invoke code { padding: 1px 6px; border-radius: var(--radius-badge); background: var(--bg-subtle); color: var(--text-primary); font-family: var(--font-mono); font-size: 12px; }
+
+  .cap-head { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+  .cap-summary { margin: 0 0 12px; color: var(--text-secondary); font-size: 13px; }
+  .cap-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--divider); }
+  .cap-list li { display: grid; grid-template-columns: 16px minmax(0, 1fr); gap: 8px; padding: 8px 0; border-bottom: 1px solid var(--divider); font-size: 13px; }
+  .cap-list .k { width: 7px; height: 7px; margin-top: 7px; border-radius: 50%; background: var(--success); }
+  .cap-list .k-tools { background: var(--warning); }
+  .cap-list .k-code { background: var(--alert); }
+  .cap-list strong { display: block; color: var(--text-primary); font-weight: 600; }
+  .cap-list span.d { color: var(--text-muted); font-family: var(--font-mono); font-size: 12px; overflow-wrap: anywhere; }
+
+  .files-panel { padding: 0; overflow: hidden; }
+  .files-panel h2 { padding: 16px 16px 0; }
+  .browser { display: grid; grid-template-columns: 220px minmax(0, 1fr); height: 520px; border-top: 1px solid var(--divider); }
+  .tree { overflow: auto; padding: 8px; border-right: 1px solid var(--divider); font-family: var(--font-mono); font-size: 12px; }
+  .tree ul { margin: 0; padding: 0 0 0 14px; list-style: none; }
+  .tree > ul { padding-left: 0; }
+  .tree summary { padding: 3px 6px; border-radius: var(--radius-badge); color: var(--text-secondary); cursor: pointer; overflow-wrap: anywhere; }
+  .tree summary:hover { background: var(--bg-subtle-hover); }
+  .tree-file { display: block; width: 100%; padding: 3px 6px; border: 1px solid transparent; border-radius: var(--radius-badge); background: none; color: var(--text-body); font: inherit; text-align: left; overflow-wrap: anywhere; }
+  .tree-file:hover { background: var(--bg-subtle-hover); }
+  .tree-file[aria-current="true"] { background: var(--accent-soft-bg); border-color: var(--accent-soft-border); color: var(--text-primary); }
+  .file { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .file-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 16px; border-bottom: 1px solid var(--divider); color: var(--text-muted); font-size: 12px; }
+  .file-head .mono { color: var(--text-primary); overflow-wrap: anywhere; }
+  .file pre { flex: 1; margin: 0; overflow: auto; padding: 16px; background: var(--bg-page); color: var(--text-body); font-family: var(--font-mono); font-size: 12px; line-height: 1.6; white-space: pre-wrap; overflow-wrap: anywhere; }
+
+  dl.meta { margin: 0; display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 8px 12px; font-size: 13px; }
+  dl.meta dt { color: var(--text-faint); }
+  dl.meta dd { margin: 0; color: var(--text-primary); overflow-wrap: anywhere; }
+  .tags { display: flex; flex-wrap: wrap; gap: 6px; }
+  .tags span { padding: 0 6px; border-radius: var(--radius-badge); background: var(--bg-subtle); color: var(--text-muted); font-size: 12px; }
+  .history { margin: 0; padding: 0; list-style: none; font-size: 13px; }
+  .history li { padding: 8px 0; border-bottom: 1px solid var(--divider); }
+  .history li:last-child { border-bottom: 0; padding-bottom: 0; }
+  .history .s { color: var(--text-primary); overflow-wrap: anywhere; }
+  .history .m { color: var(--text-faint); font-size: 12px; }
+  .history .m a { color: var(--text-muted); font-family: var(--font-mono); }
+  .tier-note { margin: 0; color: var(--text-secondary); font-size: 13px; }
+  .tier-note p { margin: 0 0 8px; }
+  .tier-note p:last-child { margin: 0; }
+
+  .state { padding: 32px 16px; text-align: center; color: var(--text-muted); }
+  .state.error { color: var(--alert); }
+
+  @media (max-width: 860px) {
+    .layout { grid-template-columns: minmax(0, 1fr); }
+  }
+  @media (max-width: 600px) {
+    .wrap { padding-top: 20px; }
+    .browser { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); height: 560px; }
+    .tree { max-height: 180px; border-right: 0; border-bottom: 1px solid var(--divider); }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <a class="back" href="./">← Skills Catalog</a>
+  <main id="main"><p class="state">Loading…</p></main>
+</div>
+
+<script>
+(() => {
+  const main = document.getElementById('main');
+  const esc = (s) => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const fmtDate = (iso) => iso ? new Date(iso).toLocaleDateString(undefined, { year: 'numeric', month: 'short', day: 'numeric' }) : '—';
+  const fmtSize = (n) => n < 1024 ? `${n} B` : `${(n / 1024).toFixed(1)} KB`;
+  const name = new URLSearchParams(location.search).get('name') || '';
+  let repo = null;
+  let files = [];
+  let plugin = null;
+
+  const ghLink = (path, kind, label) => repo
+    ? `<a href="https://github.com/${esc(repo)}/${kind}/main/${esc(path)}" target="_blank" rel="noopener">${label}</a>` : '';
+
+  function cmd(id, text, primary) {
+    return `<div class="cmd"><code id="${id}">${esc(text)}</code><button class="${primary ? 'btn-primary' : 'btn-secondary'}" type="button" data-copy-target="${id}">Copy</button></div>`;
+  }
+
+  function render(catalog) {
+    const p = plugin;
+    const cap = p.capabilities || { level: 'instructions', label: 'Instructions only', summary: '', items: [], skills: [] };
+    document.title = `${p.name} · Skills Catalog`;
+    const skills = cap.skills || [];
+    const invocations = skills.length ? `Type ${skills.map(s => `<code>${esc(s.invocation)}</code>`).join(', ')}${skills.every(s => s.manualOnly)
+      ? '. It runs only when you call it.'
+      : skills.some(s => s.manualOnly) ? ', or describe your task and Claude picks up the ones it is allowed to start.' : ', or describe your task and Claude picks it up.'}` : '';
+    const history = (p.history || []).map(h => `<li><div class="s">${esc(h.subject)}</div><div class="m">${esc(fmtDate(h.date))} · ${repo ? `<a href="https://github.com/${esc(repo)}/commit/${esc(h.sha)}" target="_blank" rel="noopener">${esc(h.sha)}</a>` : esc(h.sha)}</div></li>`).join('');
+
+    main.innerHTML = `
+      <div class="title-row">
+        <h1>${esc(p.name)}</h1>
+        <span class="badge badge-${esc(p.tier)}">${esc(p.tier)}</span>
+        <span class="cap cap-${esc(cap.level)}" title="${esc(cap.summary)}">${esc(cap.label)}</span>
+      </div>
+      <p class="lead">${esc(p.description)}</p>
+
+      <div class="layout">
+        <div class="col">
+          <section class="panel" aria-labelledby="h-use">
+            <h2 id="h-use">Use it when</h2>
+            <p class="use-when">${esc(p.useItWhen)}</p>
+          </section>
+
+          <section class="panel" aria-labelledby="h-install">
+            <h2 id="h-install">Install</h2>
+            <ol class="steps">
+              <li><p>Add the marketplace (once)</p>${cmd('c-add', catalog.addMarketplace)}</li>
+              <li><p>Install this skill</p>${cmd('c-install', p.install, true)}</li>
+              ${invocations ? `<li><p>Use it in a Claude Code session</p><p class="invoke">${invocations}</p></li>` : ''}
+            </ol>
+          </section>
+
+          <section class="panel" aria-labelledby="h-cap">
+            <h2 id="h-cap">What it can do</h2>
+            <div class="cap-head"><span class="cap cap-${esc(cap.level)}">${esc(cap.label)}</span></div>
+            <p class="cap-summary">${esc(cap.summary)}</p>
+            <ul class="cap-list">
+              ${(cap.items || []).map(i => `<li><span class="k k-${esc(i.kind)}"></span><div><strong>${esc(i.title)}</strong><span class="d">${esc(i.detail)}</span></div></li>`).join('')}
+            </ul>
+          </section>
+
+          <section class="panel files-panel" aria-labelledby="h-files">
+            <h2 id="h-files">Files</h2>
+            <div class="browser">
+              <nav class="tree" id="tree" aria-label="Plugin files"><p class="state">Loading files…</p></nav>
+              <div class="file" aria-live="polite">
+                <div class="file-head" id="file-head"></div>
+                <pre id="file-content"></pre>
+              </div>
+            </div>
+          </section>
+        </div>
+
+        <aside class="col">
+          <section class="panel" aria-labelledby="h-details">
+            <h2 id="h-details">Details</h2>
+            <dl class="meta">
+              <dt>Owner</dt><dd>${esc(p.owner)}</dd>
+              <dt>Version</dt><dd class="mono">${esc(p.version || '—')}</dd>
+              <dt>Updated</dt><dd>${esc(fmtDate(p.lastUpdated))}</dd>
+              <dt>Tags</dt><dd><div class="tags">${(p.tags || []).map(t => `<span>${esc(t)}</span>`).join('') || '—'}</div></dd>
+              <dt>Source</dt><dd>${ghLink(p.path, 'tree', `<span class="mono">${esc(p.path)}</span>`) || `<span class="mono">${esc(p.path)}</span>`}</dd>
+            </dl>
+          </section>
+
+          <section class="panel" aria-labelledby="h-tier">
+            <h2 id="h-tier">About the tier</h2>
+            <div class="tier-note">
+              <p><span class="badge badge-Experimental">Experimental</span> Every new skill starts here, after automated checks and a reviewer's merge.</p>
+              <p><span class="badge badge-Recommended">Recommended</span> Promoted by a reviewer once it has proven useful.</p>
+            </div>
+          </section>
+
+          ${history ? `<section class="panel" aria-labelledby="h-history"><h2 id="h-history">Version history</h2><ul class="history">${history}</ul></section>` : ''}
+        </aside>
+      </div>`;
+    loadFiles();
+  }
+
+  // ---- File browser ----
+  function buildTree(list) {
+    const root = { dirs: {}, files: [] };
+    for (const f of list) {
+      const parts = f.path.split('/');
+      let node = root;
+      for (const dir of parts.slice(0, -1)) node = node.dirs[dir] ??= { dirs: {}, files: [] };
+      node.files.push(f);
+    }
+    return root;
+  }
+  function renderTree(node) {
+    const dirs = Object.keys(node.dirs).sort().map(d => `<li><details open><summary>${esc(d)}/</summary>${renderTree(node.dirs[d])}</details></li>`);
+    const fs = node.files.map(f => `<li><button class="tree-file" type="button" data-path="${esc(f.path)}">${esc(f.path.split('/').pop())}</button></li>`);
+    return `<ul>${dirs.join('')}${fs.join('')}</ul>`;
+  }
+  function showFile(path) {
+    const f = files.find(x => x.path === path);
+    if (!f) return;
+    document.querySelectorAll('.tree-file').forEach(b => b.setAttribute('aria-current', String(b.dataset.path === path)));
+    document.getElementById('file-head').innerHTML = `<span class="mono">${esc(f.path)}</span><span>${fmtSize(f.size)}</span>${ghLink(`${plugin.path}/${f.path}`, 'blob', 'View on GitHub')}`;
+    document.getElementById('file-content').textContent = f.content ?? `No preview: ${f.reason}.`;
+    document.getElementById('file-content').scrollTop = 0;
+  }
+  async function loadFiles() {
+    const tree = document.getElementById('tree');
+    try {
+      const r = await fetch(`files/${encodeURIComponent(plugin.name)}.json`, { cache: 'no-cache' });
+      if (!r.ok) throw new Error(`HTTP ${r.status}`);
+      files = (await r.json()).files;
+      tree.innerHTML = renderTree(buildTree(files));
+      tree.addEventListener('click', (e) => { const b = e.target.closest('.tree-file'); if (b) showFile(b.dataset.path); });
+      const first = files.find(f => /^skills\/[^/]+\/SKILL\.md$/.test(f.path)) || files[0];
+      if (first) showFile(first.path);
+    } catch (err) {
+      tree.innerHTML = `<p class="state error">Could not load files (${esc(err.message)}).</p>`;
+    }
+  }
+
+  // ---- Copy ----
+  document.addEventListener('click', async (e) => {
+    const btn = e.target.closest('[data-copy-target]');
+    if (!btn) return;
+    const text = document.getElementById(btn.dataset.copyTarget).textContent;
+    try { await navigator.clipboard.writeText(text); } catch {
+      const ta = Object.assign(document.createElement('textarea'), { value: text });
+      document.body.appendChild(ta); ta.select(); document.execCommand('copy'); ta.remove();
+    }
+    btn.textContent = 'Copied'; btn.classList.add('copied');
+    setTimeout(() => { btn.textContent = 'Copy'; btn.classList.remove('copied'); }, 1500);
+  });
+
+  fetch('catalog.json', { cache: 'no-cache' })
+    .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
+    .then(catalog => {
+      repo = catalog.repo;
+      plugin = catalog.plugins.find(p => p.name === name);
+      if (!plugin) {
+        main.innerHTML = `<p class="state">No skill named <span class="mono">${esc(name || '(none)')}</span> in the catalog. <a href="./">Browse all skills</a>.</p>`;
+        return;
+      }
+      render(catalog);
+    })
+    .catch(err => { main.innerHTML = `<p class="state error">Could not load catalog.json (${esc(err.message)}).</p>`; });
+})();
+</script>
+</body>
+</html>

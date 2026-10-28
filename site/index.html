@@ -184,92 +184,54 @@
   .install .btn-secondary { background: var(--bg-card); }
   .install .btn-secondary:hover { background: var(--bg-subtle-hover); }
 
-  /* Whole card opens the file viewer: the name button's ::after covers the card. */
+  /* Whole card links to the skill page: the name link's ::after covers the card. */
   .card:hover { border-color: var(--border-inactive); }
-  .card-open { all: unset; cursor: pointer; }
+  .card-open { color: inherit; text-decoration: none; }
   .card-open::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-card); }
+  .card-open:focus-visible { outline: none; }
   .card-open:focus-visible::after { outline: 2px solid var(--accent-soft-border); outline-offset: 2px; }
   .install { position: relative; z-index: 1; }
-  .files-hint { margin: 0 0 8px; color: var(--text-muted); font-size: 12px; }
-  .card:hover .files-hint { color: var(--text-secondary); }
+  .card-foot { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin: 0 0 10px; color: var(--text-muted); font-size: 12px; }
+  .card:hover .card-foot .more { color: var(--text-primary); }
 
-  body:has(dialog[open]) { overflow: hidden; }
-  dialog {
-    width: min(1000px, calc(100vw - 32px));
-    max-width: none;
-    height: min(720px, calc(100dvh - 32px));
-    max-height: none;
-    padding: 0;
+  .cap { display: inline-flex; align-items: center; gap: 6px; padding: 1px 8px; border: 1px solid var(--border); border-radius: var(--radius-badge); background: var(--bg-card); color: var(--text-secondary); font-size: 12px; font-weight: 500; white-space: nowrap; }
+  .cap::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: var(--text-faint); }
+  .cap-instructions::before { background: var(--success); }
+  .cap-tools::before { background: var(--warning); }
+  .cap-code::before { background: var(--alert); }
+
+  /* In review: open publish pull requests, read live from GitHub. */
+  .review { margin: 24px 0 0; }
+  .review-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 12px; margin-bottom: 8px; }
+  .review-head h2 { margin: 0; color: var(--text-primary); font-size: 16px; font-weight: 600; }
+  .review-head .fine { color: var(--text-muted); font-size: 13px; }
+  .btn-link { border: 0; background: none; padding: 0; color: var(--text-secondary); font: inherit; font-size: 13px; text-decoration: underline; cursor: pointer; }
+  .review-list { display: grid; gap: 8px; }
+  .pr {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 4px 16px;
+    padding: 12px 16px;
     border: 1px solid var(--border);
     border-radius: var(--radius-card);
     background: var(--bg-card);
-    color: var(--text-body);
+    color: inherit;
+    text-decoration: none;
   }
-  dialog[open] { display: flex; flex-direction: column; }
-  dialog::backdrop { background: var(--text-primary); opacity: 0.4; }
-
-  .viewer-head { position: relative; padding: 16px 56px 12px 16px; border-bottom: 1px solid var(--divider); }
-  .viewer-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
-  .viewer-head h2 { margin: 0; color: var(--text-primary); font-family: var(--font-mono); font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
-  .viewer-sub { margin: 4px 0 0; color: var(--text-muted); font-size: 13px; overflow-wrap: anywhere; }
-  .viewer-sub a, .file-head a { color: var(--text-secondary); }
-  .btn-close {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    width: 32px;
-    height: 32px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius-control);
-    background: var(--bg-card);
-    color: var(--text-secondary);
-    font-size: 18px;
-    line-height: 1;
-  }
-  .btn-close:hover { background: var(--bg-subtle-hover); }
-
-  .viewer-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 260px minmax(0, 1fr); }
-  .tree { overflow: auto; padding: 8px; border-right: 1px solid var(--divider); font-family: var(--font-mono); font-size: 12px; }
-  .tree ul { margin: 0; padding: 0 0 0 14px; list-style: none; }
-  .tree > ul { padding-left: 0; }
-  .tree summary { padding: 3px 6px; border-radius: var(--radius-badge); color: var(--text-secondary); cursor: pointer; overflow-wrap: anywhere; }
-  .tree summary:hover { background: var(--bg-subtle-hover); }
-  .tree-file {
-    display: block;
-    width: 100%;
-    padding: 3px 6px;
-    border: 1px solid transparent;
-    border-radius: var(--radius-badge);
-    background: none;
-    color: var(--text-body);
-    font: inherit;
-    text-align: left;
-    overflow-wrap: anywhere;
-  }
-  .tree-file:hover { background: var(--bg-subtle-hover); }
-  .tree-file[aria-current="true"] { background: var(--accent-soft-bg); border-color: var(--accent-soft-border); color: var(--text-primary); }
-
-  .file { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
-  .file-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 16px; border-bottom: 1px solid var(--divider); color: var(--text-muted); font-size: 12px; }
-  .file-head .mono { color: var(--text-primary); font-size: 12px; overflow-wrap: anywhere; }
-  .file pre {
-    flex: 1;
-    margin: 0;
-    overflow: auto;
-    padding: 16px;
-    background: var(--bg-page);
-    color: var(--text-body);
-    font-family: var(--font-mono);
-    font-size: 12px;
-    line-height: 1.6;
-    white-space: pre-wrap;
-    overflow-wrap: anywhere;
-  }
-  .file .state { flex: 1; }
-
-  @media (max-width: 640px) {
-    .viewer-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
-    .tree { max-height: 34dvh; border-right: 0; border-bottom: 1px solid var(--divider); }
+  .pr:hover { border-color: var(--border-inactive); }
+  .pr-name { color: var(--text-primary); font-family: var(--font-mono); font-size: 14px; overflow-wrap: anywhere; }
+  .pr-meta { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 8px; color: var(--text-muted); font-size: 12px; }
+  .pr-meta img { width: 16px; height: 16px; border-radius: 50%; }
+  .pr-status { grid-row: 1 / span 2; grid-column: 2; display: inline-flex; align-items: center; gap: 6px; padding: 2px 8px; border-radius: var(--radius-badge); font-size: 12px; font-weight: 600; white-space: nowrap; }
+  .pr-status::before { content: ""; width: 7px; height: 7px; border-radius: 50%; background: currentColor; }
+  .st-running { color: var(--warning); background: var(--warning-bg); }
+  .st-passed { color: var(--success); background: var(--success-bg); }
+  .st-failed { color: var(--alert); background: var(--bg-subtle); }
+  .st-waiting { color: var(--text-muted); background: var(--bg-subtle); }
+  @media (max-width: 480px) {
+    .pr { grid-template-columns: minmax(0, 1fr); }
+    .pr-status { grid-row: auto; grid-column: auto; justify-self: start; }
   }
 
   .state { padding: 32px 16px; text-align: center; color: var(--text-muted); }
@@ -304,6 +266,15 @@
   </header>
 
   <main>
+    <section class="review" id="in-review" aria-labelledby="review-title" hidden>
+      <div class="review-head">
+        <h2 id="review-title">In review</h2>
+        <span class="fine" id="review-note">Submitted skills waiting for checks and a reviewer. They join the catalog when merged.</span>
+        <button class="btn-link" type="button" id="review-refresh">Refresh</button>
+      </div>
+      <div class="review-list" id="review-list"></div>
+    </section>
+
     <div class="toolbar" role="search">
       <input id="q" class="search" type="search" placeholder="Search by name, description or tag" autocomplete="off" aria-label="Search skills">
       <div class="filters" role="group" aria-label="Filter by tier">
@@ -318,24 +289,6 @@
 
   <footer id="footer">Generated from the repository's marketplace.json.</footer>
 </div>
-
-<dialog id="viewer" aria-labelledby="viewer-title">
-  <div class="viewer-head">
-    <div class="viewer-title-row">
-      <h2 id="viewer-title"></h2>
-      <span id="viewer-badge" class="badge"></span>
-    </div>
-    <p class="viewer-sub"><span class="mono" id="viewer-path"></span><span id="viewer-gh"></span></p>
-    <button class="btn-close" type="button" id="viewer-close" aria-label="Close">×</button>
-  </div>
-  <div class="viewer-body">
-    <nav class="tree" id="tree" aria-label="Plugin files"></nav>
-    <section class="file" aria-live="polite">
-      <div class="file-head" id="file-head"></div>
-      <pre id="file-content"></pre>
-    </section>
-  </div>
-</dialog>
 
 <script>
 (() => {
@@ -386,7 +339,7 @@
     const tags = (p.tags || []).map(t => `<li>${esc(t)}</li>`).join('');
     return `<article class="card">
       <div class="card-head">
-        <h2><button class="card-open" type="button" data-open="${esc(p.name)}" aria-label="View files of ${esc(p.name)}">${esc(p.name)}</button></h2>
+        <h2><a class="card-open" href="skill.html?name=${encodeURIComponent(p.name)}">${esc(p.name)}</a></h2>
         <span class="badge badge-${esc(p.tier)}">${esc(p.tier)}</span>
       </div>
       <p class="use-when"><strong>Use it when:</strong> ${esc(p.useItWhen)}</p>
@@ -396,7 +349,7 @@
         <div><dt>Version</dt><dd class="mono">${esc(p.version || '—')}</dd></div>
         <div><dt>Updated</dt><dd>${esc(fmtDate(p.lastUpdated))}</dd></div>
       </dl>
-      ${p.fileCount ? `<p class="files-hint">View ${p.fileCount} files →</p>` : ''}
+      <p class="card-foot">${p.capabilities ? `<span class="cap cap-${esc(p.capabilities.level)}" title="${esc(p.capabilities.summary)}">${esc(p.capabilities.label)}</span>` : '<span></span>'}<span class="more">Details →</span></p>
       <div class="install">
         <code>${esc(p.install)}</code>
         <button class="btn-secondary" type="button" data-copy="${esc(p.install)}" aria-label="Copy install command for ${esc(p.name)}">Copy</button>
@@ -414,104 +367,87 @@
     grid.innerHTML = list.length ? list.map(card).join('') : '<p class="state">No skills match your search.</p>';
   }
 
-  // File viewer. The URL hash (#plugin-name) is the state, so cards are linkable and Back closes the viewer.
-  const viewer = document.getElementById('viewer');
-  const tree = document.getElementById('tree');
-  const fileHead = document.getElementById('file-head');
-  const fileContent = document.getElementById('file-content');
-  const fileCache = new Map();
-  let repo = null;
-  let current = null;
-
-  const fmtSize = (n) => n < 1024 ? `${n} B` : `${(n / 1024).toFixed(1)} KB`;
-  const ghLink = (path, kind, label) => repo
-    ? `<a href="https://github.com/${esc(repo)}/${kind}/main/${esc(path)}" target="_blank" rel="noopener">${label}</a>` : '';
-
-  grid.addEventListener('click', (e) => {
-    const btn = e.target.closest('[data-open]');
-    if (btn) location.hash = encodeURIComponent(btn.dataset.open);
-  });
-  document.getElementById('viewer-close').addEventListener('click', () => viewer.close());
-  viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
-  viewer.addEventListener('close', () => {
-    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
-    const opener = current && grid.querySelector(`[data-open="${CSS.escape(current.name)}"]`);
-    current = null;
-    opener?.focus();
-  });
-  window.addEventListener('hashchange', route);
-
-  function route() {
+  // Old #name links opened a pop-up viewer; send them to the skill page instead.
+  function redirectLegacyHash() {
     const name = decodeURIComponent(location.hash.slice(1));
-    const p = plugins.find(x => x.name === name);
-    if (p) openViewer(p);
-    else if (viewer.open) viewer.close();
+    if (name && plugins.some(p => p.name === name)) location.replace(`skill.html?name=${encodeURIComponent(name)}`);
   }
 
-  // Nested folders first, then files, both alphabetical.
-  function buildTree(files) {
-    const root = { dirs: {}, files: [] };
-    for (const f of files) {
-      const parts = f.path.split('/');
-      let node = root;
-      for (const dir of parts.slice(0, -1)) node = node.dirs[dir] ??= { dirs: {}, files: [] };
-      node.files.push(f);
-    }
-    return root;
+  // In review: open "Add <name> skill" pull requests, with their check status, from GitHub's API.
+  // Without a token GitHub allows 60 requests an hour per visitor, so it loads on open, on Refresh and
+  // when the tab comes back into view, and re-checks every 30 s (at most 10 times) while a submission's
+  // checks are still pending. With the publisher's token (same tab) it also refreshes every 20 s.
+  const review = document.getElementById('in-review');
+  const reviewList = document.getElementById('review-list');
+  const reviewNote = document.getElementById('review-note');
+  const REVIEW_NOTE = reviewNote.textContent;
+  let repo = null;
+  let lastLoad = 0;
+  let pendingPolls = 0;
+  let pollTimer = null;
+  const token = (() => { try { return sessionStorage.getItem('gh-token'); } catch { return null; } })();
+  const ago = (iso) => {
+    const s = Math.max(0, (Date.now() - new Date(iso)) / 1000);
+    if (s < 60) return 'just now';
+    if (s < 3600) return `${Math.round(s / 60)} min ago`;
+    if (s < 86400) return `${Math.round(s / 3600)} h ago`;
+    return `${Math.round(s / 86400)} d ago`;
+  };
+  // Anonymous API answers are cached for 60 s (s-maxage=60); a unique query parameter gets a fresh one.
+  async function gh(path) {
+    const r = await fetch(`https://api.github.com${path}${path.includes('?') ? '&' : '?'}t=${Date.now()}`, {
+      headers: { Accept: 'application/vnd.github+json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
+      cache: 'no-store',
+    });
+    if (r.status === 403 || r.status === 429) throw new Error('rate');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    return r.json();
   }
-  function renderTree(node) {
-    const dirs = Object.keys(node.dirs).sort().map(d =>
-      `<li><details open><summary>${esc(d)}/</summary>${renderTree(node.dirs[d])}</details></li>`);
-    const files = node.files.map(f =>
-      `<li><button class="tree-file" type="button" data-path="${esc(f.path)}">${esc(f.path.split('/').pop())}</button></li>`);
-    return `<ul>${dirs.join('')}${files.join('')}</ul>`;
+  function checkState(runs) {
+    if (!runs.total_count) return ['waiting', 'Waiting for checks'];
+    if (runs.check_runs.some(c => c.status !== 'completed')) return ['running', 'Checks running'];
+    if (runs.check_runs.some(c => ['failure', 'cancelled', 'timed_out', 'action_required'].includes(c.conclusion))) return ['failed', 'Checks failed'];
+    return ['passed', 'Checks passed'];
   }
-
-  function showFile(path) {
-    const f = current.files.find(x => x.path === path);
-    if (!f) return;
-    tree.querySelectorAll('.tree-file').forEach(b => b.setAttribute('aria-current', String(b.dataset.path === path)));
-    fileHead.innerHTML = `<span class="mono">${esc(f.path)}</span><span>${fmtSize(f.size)}</span>${ghLink(`${current.plugin.path}/${f.path}`, 'blob', 'View on GitHub')}`;
-    fileContent.hidden = f.content === null;
-    fileContent.textContent = f.content ?? '';
-    fileContent.scrollTop = 0;
-    viewer.querySelector('.file > .state')?.remove();
-    if (f.content === null) fileHead.insertAdjacentHTML('afterend', `<p class="state">No preview: ${esc(f.reason)}.</p>`);
-  }
-  tree.addEventListener('click', (e) => {
-    const btn = e.target.closest('.tree-file');
-    if (btn) showFile(btn.dataset.path);
-  });
-
-  async function openViewer(p) {
-    document.getElementById('viewer-title').textContent = p.name;
-    const badge = document.getElementById('viewer-badge');
-    badge.textContent = p.tier;
-    badge.className = `badge badge-${p.tier}`;
-    document.getElementById('viewer-path').textContent = p.path;
-    document.getElementById('viewer-gh').innerHTML = repo ? ` · ${ghLink(p.path, 'tree', 'Open folder on GitHub')}` : '';
-    tree.innerHTML = '<p class="state">Loading files…</p>';
-    fileHead.innerHTML = '';
-    fileContent.textContent = '';
-    fileContent.hidden = false;
-    viewer.querySelector('.file > .state')?.remove();
-    if (!viewer.open) viewer.showModal();
-    current = { name: p.name, plugin: p, files: [] };
+  async function loadReview() {
+    if (!repo) return;
+    lastLoad = Date.now();
     try {
-      if (!fileCache.has(p.name)) {
-        const r = await fetch(`files/${encodeURIComponent(p.name)}.json`, { cache: 'no-cache' });
-        if (!r.ok) throw new Error(`HTTP ${r.status}`);
-        fileCache.set(p.name, (await r.json()).files);
+      const prs = (await gh(`/repos/${repo}/pulls?state=open&per_page=30`))
+        .filter(pr => /^Add .+ skill$/.test(pr.title) || pr.head.ref.startsWith('add-skill/'));
+      const rows = await Promise.all(prs.map(async pr => {
+        const [cls, label] = checkState(await gh(`/repos/${repo}/commits/${pr.head.sha}/check-runs`));
+        const name = (pr.title.match(/^Add (.+) skill$/) || [])[1] || pr.head.ref.replace(/^add-skill\//, '');
+        return `<a class="pr" href="${esc(pr.html_url)}" target="_blank" rel="noopener">
+          <span class="pr-name">${esc(name)}</span>
+          <span class="pr-status st-${cls}">${label}</span>
+          <span class="pr-meta"><img src="${esc(pr.user.avatar_url)}&s=32" alt="">${esc(pr.user.login)} · opened ${ago(pr.created_at)} · pull request #${pr.number} ↗</span>
+        </a>`;
+      }));
+      reviewList.innerHTML = rows.join('');
+      reviewNote.textContent = REVIEW_NOTE;
+      clearTimeout(pollTimer);
+      const pending = reviewList.querySelector('.st-waiting, .st-running');
+      if (pending && !token && pendingPolls < 10) {
+        pendingPolls += 1;
+        pollTimer = setTimeout(loadReview, 30000);
+      } else if (!pending) pendingPolls = 0;
+      review.hidden = rows.length === 0;
+      if (!review.hidden && location.hash === '#in-review' && !review.dataset.scrolled) {
+        review.dataset.scrolled = '1';
+        review.scrollIntoView();
       }
-      if (current?.name !== p.name) return; // another plugin was opened meanwhile
-      current.files = fileCache.get(p.name);
-      tree.innerHTML = renderTree(buildTree(current.files));
-      const first = current.files.find(f => /^skills\/[^/]+\/SKILL\.md$/.test(f.path)) || current.files[0];
-      if (first) showFile(first.path);
     } catch (err) {
-      tree.innerHTML = `<p class="state error">Could not load files (${esc(err.message)}).</p>`;
+      reviewNote.textContent = err.message === 'rate'
+        ? "GitHub's hourly limit for anonymous visitors was reached. Try Refresh in a few minutes."
+        : `Could not load submissions from GitHub (${err.message}).`;
     }
   }
+  document.getElementById('review-refresh').addEventListener('click', loadReview);
+  document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible' && Date.now() - lastLoad > 30000) loadReview();
+  });
+  if (token) setInterval(() => { if (document.visibilityState === 'visible') loadReview(); }, 20000);
 
   fetch('catalog.json', { cache: 'no-cache' })
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
@@ -524,7 +460,8 @@
           `Source of truth: <a href="https://github.com/${esc(data.repo)}">${esc(data.repo)}</a>. A personal lab, not production.`;
       }
       render();
-      route();
+      redirectLegacyHash();
+      loadReview();
     })
     .catch(err => {
       grid.innerHTML = `<p class="state error">Could not load catalog.json (${esc(err.message)}).</p>`;

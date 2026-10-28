@@ -524,7 +524,8 @@ $('publish').addEventListener('click', async () => {
     });
     state.existing.push(plugin.name);
     showResult(true, `<strong>Pull request <a href="${esc(pr.url)}" target="_blank" rel="noopener">#${pr.number}</a> is open.</strong>
-      <ol><li>Checks run on it (validation, catalog rules, secret scan).</li><li>A reviewer merges it.</li><li>The catalog page updates within a couple of minutes.</li></ol>`);
+      <ol><li>Checks run on it (validation, catalog rules, secret scan).</li><li>A reviewer merges it.</li><li>The catalog page updates within a couple of minutes.</li></ol>
+      <p><a href="./#in-review">See it under “In review” in the catalog →</a></p>`);
     if (state.mode === 'write') store.set('localStorage', 'publish-draft', null);
   } catch (err) {
     showResult(false, `Publishing failed: ${esc(err.message)}`);
