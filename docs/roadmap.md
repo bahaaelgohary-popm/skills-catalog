@@ -1,5 +1,8 @@
 # Roadmap
 
+> [!NOTE]
+> Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.
+
 What this lab would need to become a product people rely on. Each item says what changes for users and how we'd know it worked.
 
 ## 1. Analytics and repeat use

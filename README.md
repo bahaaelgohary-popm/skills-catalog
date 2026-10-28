@@ -1,5 +1,8 @@
 # Skills Catalog
 
+> [!NOTE]
+> Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.
+
 A small catalog of generic Claude Code skills, each packaged as a plugin in a plugin marketplace. This repository is the source of truth: a GitHub Action checks every change, generates `catalog.json`, and publishes a searchable page to GitHub Pages.
 
 > A personal lab, not production. [Roadmap](docs/roadmap.md): analytics, publishing for anyone, other agents, and putting this front end on an existing registry.
