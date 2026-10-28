@@ -199,7 +199,7 @@
       <button class="close" type="button" aria-label="Close" id="tiers-close">×</button>
       <h3>Tiers</h3>
       <dl>
-        <dt><span class="badge badge-Experimental">Experimental</span></dt><dd>Every new item starts here, after automated checks pass and a reviewer merges it.</dd>
+        <dt><span class="badge badge-Experimental">Experimental</span></dt><dd>Every new item starts here once automated checks pass. Items with no bundled code merge automatically; items that run code are merged by a reviewer.</dd>
         <dt><span class="badge badge-Recommended">Recommended</span></dt><dd>Promoted by a reviewer once it has proven useful.</dd>
       </dl>
       <h3>What it can do</h3>
@@ -396,7 +396,7 @@
     const live = items.filter(p => !p.stale && !p.deprecated);
     const shelves = [
       { id: 'recommended', title: 'Recommended', sub: 'Promoted by reviewers after they proved useful', list: live.filter(p => p.tier === 'Recommended').sort((a, b) => a.name.localeCompare(b.name)), see: { tier: ['Recommended'] } },
-      { id: 'new', title: 'New and experimental', sub: 'Passed automated checks and review, looking for early users', list: live.filter(p => p.tier === 'Experimental').sort((a, b) => time(b.addedAt) - time(a.addedAt)), see: { tier: ['Experimental'], sort: 'newest' } },
+      { id: 'new', title: 'New and experimental', sub: 'Passed automated checks, looking for early users', list: live.filter(p => p.tier === 'Experimental').sort((a, b) => time(b.addedAt) - time(a.addedAt)), see: { tier: ['Experimental'], sort: 'newest' } },
       { id: 'updated', title: 'Recently updated', sub: 'Latest changes across the marketplace', list: [...live].sort((a, b) => time(b.lastUpdated) - time(a.lastUpdated)), see: { sort: 'updated' } },
     ];
     $('shelf-slots').innerHTML = shelves.filter(s => s.list.length).map(s => `
