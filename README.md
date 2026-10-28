@@ -50,6 +50,8 @@ Catalog metadata lives in `catalog.yaml`, not in `SKILL.md` frontmatter, so `cla
 3. **Merge.** A reviewer reads the skill and merges.
 4. **Catalog updates.** On `main`, the same Action regenerates `catalog.json` (including each plugin's last commit date) and redeploys the page. Users get the new plugin with `claude plugin marketplace update skills-catalog`.
 
+Prefer to do it by hand? See [Publishing a skill manually](docs/publishing-manually.md).
+
 ## Run the checks locally
 
 ```bash
