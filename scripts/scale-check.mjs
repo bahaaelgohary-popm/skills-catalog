@@ -35,7 +35,9 @@ try {
   writeFileSync(marketPath, JSON.stringify(market, null, 2) + '\n');
 
   // A one-commit history, with origin/main pointing at it, like a CI checkout of main.
-  sh('git init -q && git -c user.name=fixture -c user.email=fixture@example.invalid add -A && git -c user.name=fixture -c user.email=fixture@example.invalid commit -q -m fixture && git update-ref refs/remotes/origin/main HEAD');
+  // No background maintenance, so nothing is still writing to .git when the folder is deleted.
+  const g = 'git -c user.name=fixture -c user.email=fixture@example.invalid -c gc.auto=0 -c maintenance.auto=false';
+  sh(`git init -q -b main && ${g} add -A && ${g} commit -q -m fixture && git update-ref refs/remotes/origin/main HEAD`);
 
   const time = (label, args) => {
     const start = performance.now();
@@ -51,5 +53,6 @@ try {
   const slow = results.filter(r => r.ms > LIMIT_MS);
   if (slow.length) { console.error(`✘ Over the limit: ${slow.map(r => r.label).join(', ')}`); process.exitCode = 1; }
 } finally {
-  rmSync(dir, { recursive: true, force: true });
+  try { rmSync(dir, { recursive: true, force: true, maxRetries: 5, retryDelay: 200 }); }
+  catch (e) { console.warn(`Could not delete ${dir}: ${e.message}`); }
 }
