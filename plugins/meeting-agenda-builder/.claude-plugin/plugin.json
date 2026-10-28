@@ -1,0 +1,14 @@
+{
+  "name": "meeting-agenda-builder",
+  "version": "0.1.0",
+  "description": "Turns a meeting goal, length and attendees into a timed agenda with a clear outcome for each item. Use when someone asks for a meeting agenda, wants to plan a workshop or kickoff, or says \"help me run this meeting\".",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "meetings",
+    "agenda",
+    "facilitation"
+  ]
+}
