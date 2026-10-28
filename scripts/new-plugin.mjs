@@ -60,6 +60,10 @@ const branch = `add-skill/${name}`;
 if (args.pr) {
   if (!has('gh')) die('--pr needs the GitHub CLI (gh), logged in with gh auth login');
   if (run('git', ['status', '--porcelain'])) die('The checkout has uncommitted changes; commit or stash them first');
+  // Without an explicit identity git falls back to the OS account name and email, which would be published in the commit.
+  let email = '';
+  try { email = run('git', ['config', 'user.email']); } catch {}
+  if (!email) die('Set the name and email to publish under first, e.g. your GitHub noreply address:\n  git config --global user.name "<github-login>"\n  git config --global user.email "<id>+<github-login>@users.noreply.github.com"');
   let previous;
   try { previous = ['switch', '--quiet', run('git', ['symbolic-ref', '--quiet', '--short', 'HEAD'])]; }
   catch { previous = ['switch', '--quiet', '--detach', run('git', ['rev-parse', 'HEAD'])]; }
