@@ -16,6 +16,11 @@
       "description": "Review a change against a practical checklist and report findings by severity"
     },
     {
+      "name": "decision-record-writer",
+      "source": "./plugins/decision-record-writer",
+      "description": "Write an architecture decision record (ADR) from a discussion or a proposal, with context, options, decision and consequences, numbered and saved next to the team's existing ADRs. Use when a technical decision has been made or needs to be written down."
+    },
+    {
       "name": "incident-postmortem",
       "source": "./plugins/incident-postmortem",
       "description": "Blameless incident postmortems: a writer skill plus a timeline-builder agent that turns messy logs into a clean timeline"
