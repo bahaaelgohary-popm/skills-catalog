@@ -51,13 +51,20 @@ Catalog metadata lives in `catalog.yaml`, not in `SKILL.md` frontmatter, so `cla
 
 ## How publishing works
 
-1. **PR.** Three ways in, all ending in a pull request (never a push to `main`):
-   - **From Claude Code:** with `publish-skill` installed, run `/publish-skill:publish-skill <path-to-skill-folder>`. It clones this repo to a temp folder, adds the plugin, validates, and opens the PR with `gh`.
+1. **PR.** Three ways in, all ending in a pull request (never a push to `main`, which is protected). In this lab only the owner's account can publish: the routes open a branch in this repository, so they need write access. Anyone can browse, install, and try the editor and its checks.
+   - **From Claude Code:** with `publish-skill` installed, run `/publish-skill:publish-skill <path-to-skill-folder>`. It clones this repo to a temp folder, adds the plugin (or, for a skill that already exists, publishes a new version with `--update`), validates, and opens the PR with `gh`.
    - **Web editor:** on the [Publish page](https://bahaaelgohary-popm.github.io/skills-catalog/publish.html), write `SKILL.md` in the browser.
    - **Web upload:** on the same page, drop loose files, a folder, or a `.zip` with the skill folder inside.
 
    The web publisher runs the same checks as the CLI in the browser and opens the PR through the GitHub API with a fine-grained token you paste (kept only in that tab; needs Contents and Pull requests read/write on this repo).
-2. **Checks.** The Action runs on the PR: `claude plugin validate --strict`, catalog checks (every plugin has `catalog.yaml` with owner, tier, jobs and works_with from the allowed lists; names match the marketplace entry; no unlisted folders; new plugins start as Experimental), a gitleaks secret scan, and a test build of `catalog.json`.
+2. **Checks.** The Action runs on the PR, and `main` only accepts a merge when they pass:
+   - `claude plugin validate --strict` on the marketplace and every plugin;
+   - unit tests (`tests/`) for the publisher, the auto-merge rules and versions;
+   - catalog checks: every plugin has `catalog.yaml` with owner, tier, jobs and works_with from the allowed lists; names match the marketplace entry; no unlisted folders; new plugins start as Experimental; an edited plugin must raise its `version`;
+   - no other open PR already proposes the same new plugin (the older PR keeps the name);
+   - a gitleaks secret scan, and a test build of `catalog.json`.
+
+   A separate, non-blocking job times the scripts on 900 generated plugins to catch slowdowns.
 3. **Merge.** After the checks pass, `.github/workflows/auto-merge.yml` squash-merges the PR without a person if it only adds one new Experimental plugin (its folder plus one `marketplace.json` entry) and bundles no code ("Instructions only", or "Pre-approved tools" limited to the read-only `Read`, `Grep` and `Glob`). Anything else, such as skills with scripts, hooks or MCP servers, skills that pre-approve other tools (they run without asking), edits to existing skills, or changes outside `plugins/`, waits for a reviewer. Add the `hold` label to a PR to keep it open. The rules are in `scripts/auto-merge-check.mjs`; dry-run them with `node scripts/auto-merge-check.mjs --repo <owner/name> --pr <n>`.
 4. **Catalog updates.** On `main`, the same Action regenerates `catalog.json` (including each plugin's last commit date) and redeploys the page. Users get the new plugin with `claude plugin marketplace update skills-catalog`.
 
