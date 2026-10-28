@@ -167,6 +167,7 @@
 
   .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 16px; }
   .card {
+    position: relative;
     display: flex;
     flex-direction: column;
     background: var(--bg-card);
@@ -227,6 +228,94 @@
   .install .btn-secondary { background: var(--bg-card); }
   .install .btn-secondary:hover { background: var(--bg-subtle-hover); }
 
+  /* Whole card opens the file viewer: the name button's ::after covers the card. */
+  .card:hover { border-color: var(--border-inactive); }
+  .card-open { all: unset; cursor: pointer; }
+  .card-open::after { content: ""; position: absolute; inset: 0; border-radius: var(--radius-card); }
+  .card-open:focus-visible::after { outline: 2px solid var(--accent-soft-border); outline-offset: 2px; }
+  .install { position: relative; z-index: 1; }
+  .files-hint { margin: 0 0 8px; color: var(--text-muted); font-size: 12px; }
+  .card:hover .files-hint { color: var(--text-secondary); }
+
+  body:has(dialog[open]) { overflow: hidden; }
+  dialog {
+    width: min(1000px, calc(100vw - 32px));
+    max-width: none;
+    height: min(720px, calc(100dvh - 32px));
+    max-height: none;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-card);
+    background: var(--bg-card);
+    color: var(--text-body);
+  }
+  dialog[open] { display: flex; flex-direction: column; }
+  dialog::backdrop { background: var(--text-primary); opacity: 0.4; }
+
+  .viewer-head { position: relative; padding: 16px 56px 12px 16px; border-bottom: 1px solid var(--divider); }
+  .viewer-title-row { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .viewer-head h2 { margin: 0; color: var(--text-primary); font-family: var(--font-mono); font-size: 16px; font-weight: 500; overflow-wrap: anywhere; }
+  .viewer-sub { margin: 4px 0 0; color: var(--text-muted); font-size: 13px; overflow-wrap: anywhere; }
+  .viewer-sub a, .file-head a { color: var(--text-secondary); }
+  .btn-close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    width: 32px;
+    height: 32px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius-control);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    font-size: 18px;
+    line-height: 1;
+  }
+  .btn-close:hover { background: var(--bg-subtle-hover); }
+
+  .viewer-body { flex: 1; min-height: 0; display: grid; grid-template-columns: 260px minmax(0, 1fr); }
+  .tree { overflow: auto; padding: 8px; border-right: 1px solid var(--divider); font-family: var(--font-mono); font-size: 12px; }
+  .tree ul { margin: 0; padding: 0 0 0 14px; list-style: none; }
+  .tree > ul { padding-left: 0; }
+  .tree summary { padding: 3px 6px; border-radius: var(--radius-badge); color: var(--text-secondary); cursor: pointer; overflow-wrap: anywhere; }
+  .tree summary:hover { background: var(--bg-subtle-hover); }
+  .tree-file {
+    display: block;
+    width: 100%;
+    padding: 3px 6px;
+    border: 1px solid transparent;
+    border-radius: var(--radius-badge);
+    background: none;
+    color: var(--text-body);
+    font: inherit;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+  .tree-file:hover { background: var(--bg-subtle-hover); }
+  .tree-file[aria-current="true"] { background: var(--accent-soft-bg); border-color: var(--accent-soft-border); color: var(--text-primary); }
+
+  .file { display: flex; flex-direction: column; min-width: 0; min-height: 0; }
+  .file-head { display: flex; flex-wrap: wrap; align-items: center; gap: 4px 12px; padding: 10px 16px; border-bottom: 1px solid var(--divider); color: var(--text-muted); font-size: 12px; }
+  .file-head .mono { color: var(--text-primary); font-size: 12px; overflow-wrap: anywhere; }
+  .file pre {
+    flex: 1;
+    margin: 0;
+    overflow: auto;
+    padding: 16px;
+    background: var(--bg-page);
+    color: var(--text-body);
+    font-family: var(--font-mono);
+    font-size: 12px;
+    line-height: 1.6;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+  }
+  .file .state { flex: 1; }
+
+  @media (max-width: 640px) {
+    .viewer-body { grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); }
+    .tree { max-height: 34dvh; border-right: 0; border-bottom: 1px solid var(--divider); }
+  }
+
   .state { padding: 32px 16px; text-align: center; color: var(--text-muted); }
   .state.error { color: var(--alert); }
 
@@ -270,6 +359,24 @@
 
   <footer id="footer">Generated from the repository's marketplace.json.</footer>
 </div>
+
+<dialog id="viewer" aria-labelledby="viewer-title">
+  <div class="viewer-head">
+    <div class="viewer-title-row">
+      <h2 id="viewer-title"></h2>
+      <span id="viewer-badge" class="badge"></span>
+    </div>
+    <p class="viewer-sub"><span class="mono" id="viewer-path"></span><span id="viewer-gh"></span></p>
+    <button class="btn-close" type="button" id="viewer-close" aria-label="Close">×</button>
+  </div>
+  <div class="viewer-body">
+    <nav class="tree" id="tree" aria-label="Plugin files"></nav>
+    <section class="file" aria-live="polite">
+      <div class="file-head" id="file-head"></div>
+      <pre id="file-content"></pre>
+    </section>
+  </div>
+</dialog>
 
 <script>
 (() => {
@@ -320,7 +427,7 @@
     const tags = (p.tags || []).map(t => `<li>${esc(t)}</li>`).join('');
     return `<article class="card">
       <div class="card-head">
-        <h2>${esc(p.name)}</h2>
+        <h2><button class="card-open" type="button" data-open="${esc(p.name)}" aria-label="View files of ${esc(p.name)}">${esc(p.name)}</button></h2>
         <span class="badge badge-${esc(p.lifecycle)}">${esc(p.lifecycle)}</span>
       </div>
       <p class="use-when"><strong>Use it when:</strong> ${esc(p.useItWhen)}</p>
@@ -330,6 +437,7 @@
         <div><dt>Version</dt><dd class="mono">${esc(p.version || '—')}</dd></div>
         <div><dt>Updated</dt><dd>${esc(fmtDate(p.lastUpdated))}</dd></div>
       </dl>
+      ${p.fileCount ? `<p class="files-hint">View ${p.fileCount} files →</p>` : ''}
       <div class="install">
         <code>${esc(p.install)}</code>
         <button class="btn-secondary" type="button" data-copy="${esc(p.install)}" aria-label="Copy install command for ${esc(p.name)}">Copy</button>
@@ -347,16 +455,117 @@
     grid.innerHTML = list.length ? list.map(card).join('') : '<p class="state">No skills match your search.</p>';
   }
 
+  // File viewer. The URL hash (#plugin-name) is the state, so cards are linkable and Back closes the viewer.
+  const viewer = document.getElementById('viewer');
+  const tree = document.getElementById('tree');
+  const fileHead = document.getElementById('file-head');
+  const fileContent = document.getElementById('file-content');
+  const fileCache = new Map();
+  let repo = null;
+  let current = null;
+
+  const fmtSize = (n) => n < 1024 ? `${n} B` : `${(n / 1024).toFixed(1)} KB`;
+  const ghLink = (path, kind, label) => repo
+    ? `<a href="https://github.com/${esc(repo)}/${kind}/main/${esc(path)}" target="_blank" rel="noopener">${label}</a>` : '';
+
+  grid.addEventListener('click', (e) => {
+    const btn = e.target.closest('[data-open]');
+    if (btn) location.hash = encodeURIComponent(btn.dataset.open);
+  });
+  document.getElementById('viewer-close').addEventListener('click', () => viewer.close());
+  viewer.addEventListener('click', (e) => { if (e.target === viewer) viewer.close(); });
+  viewer.addEventListener('close', () => {
+    if (location.hash) history.replaceState(null, '', location.pathname + location.search);
+    const opener = current && grid.querySelector(`[data-open="${CSS.escape(current.name)}"]`);
+    current = null;
+    opener?.focus();
+  });
+  window.addEventListener('hashchange', route);
+
+  function route() {
+    const name = decodeURIComponent(location.hash.slice(1));
+    const p = plugins.find(x => x.name === name);
+    if (p) openViewer(p);
+    else if (viewer.open) viewer.close();
+  }
+
+  // Nested folders first, then files, both alphabetical.
+  function buildTree(files) {
+    const root = { dirs: {}, files: [] };
+    for (const f of files) {
+      const parts = f.path.split('/');
+      let node = root;
+      for (const dir of parts.slice(0, -1)) node = node.dirs[dir] ??= { dirs: {}, files: [] };
+      node.files.push(f);
+    }
+    return root;
+  }
+  function renderTree(node) {
+    const dirs = Object.keys(node.dirs).sort().map(d =>
+      `<li><details open><summary>${esc(d)}/</summary>${renderTree(node.dirs[d])}</details></li>`);
+    const files = node.files.map(f =>
+      `<li><button class="tree-file" type="button" data-path="${esc(f.path)}">${esc(f.path.split('/').pop())}</button></li>`);
+    return `<ul>${dirs.join('')}${files.join('')}</ul>`;
+  }
+
+  function showFile(path) {
+    const f = current.files.find(x => x.path === path);
+    if (!f) return;
+    tree.querySelectorAll('.tree-file').forEach(b => b.setAttribute('aria-current', String(b.dataset.path === path)));
+    fileHead.innerHTML = `<span class="mono">${esc(f.path)}</span><span>${fmtSize(f.size)}</span>${ghLink(`${current.plugin.path}/${f.path}`, 'blob', 'View on GitHub')}`;
+    fileContent.hidden = f.content === null;
+    fileContent.textContent = f.content ?? '';
+    fileContent.scrollTop = 0;
+    viewer.querySelector('.file > .state')?.remove();
+    if (f.content === null) fileHead.insertAdjacentHTML('afterend', `<p class="state">No preview: ${esc(f.reason)}.</p>`);
+  }
+  tree.addEventListener('click', (e) => {
+    const btn = e.target.closest('.tree-file');
+    if (btn) showFile(btn.dataset.path);
+  });
+
+  async function openViewer(p) {
+    document.getElementById('viewer-title').textContent = p.name;
+    const badge = document.getElementById('viewer-badge');
+    badge.textContent = p.lifecycle;
+    badge.className = `badge badge-${p.lifecycle}`;
+    document.getElementById('viewer-path').textContent = p.path;
+    document.getElementById('viewer-gh').innerHTML = repo ? ` · ${ghLink(p.path, 'tree', 'Open folder on GitHub')}` : '';
+    tree.innerHTML = '<p class="state">Loading files…</p>';
+    fileHead.innerHTML = '';
+    fileContent.textContent = '';
+    fileContent.hidden = false;
+    viewer.querySelector('.file > .state')?.remove();
+    if (!viewer.open) viewer.showModal();
+    current = { name: p.name, plugin: p, files: [] };
+    try {
+      if (!fileCache.has(p.name)) {
+        const r = await fetch(`files/${encodeURIComponent(p.name)}.json`, { cache: 'no-cache' });
+        if (!r.ok) throw new Error(`HTTP ${r.status}`);
+        fileCache.set(p.name, (await r.json()).files);
+      }
+      if (current?.name !== p.name) return; // another plugin was opened meanwhile
+      current.files = fileCache.get(p.name);
+      tree.innerHTML = renderTree(buildTree(current.files));
+      const first = current.files.find(f => /^skills\/[^/]+\/SKILL\.md$/.test(f.path)) || current.files[0];
+      if (first) showFile(first.path);
+    } catch (err) {
+      tree.innerHTML = `<p class="state error">Could not load files (${esc(err.message)}).</p>`;
+    }
+  }
+
   fetch('catalog.json', { cache: 'no-cache' })
     .then(r => { if (!r.ok) throw new Error(`HTTP ${r.status}`); return r.json(); })
     .then(data => {
       plugins = data.plugins || [];
+      repo = data.repo || null;
       document.getElementById('add-cmd').textContent = data.addMarketplace;
       if (data.repo) {
         document.getElementById('footer').innerHTML =
           `Source of truth: <a href="https://github.com/${esc(data.repo)}">${esc(data.repo)}</a>. A personal lab, not production.`;
       }
       render();
+      route();
     })
     .catch(err => {
       grid.innerHTML = `<p class="state error">Could not load catalog.json (${esc(err.message)}).</p>`;

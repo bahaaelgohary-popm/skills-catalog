@@ -1,10 +1,33 @@
-// Generate catalog.json from marketplace.json + plugin.json + catalog.yaml + git history.
+// Generate catalog.json from marketplace.json + plugin.json + catalog.yaml + git history,
+// plus files/<plugin>.json with each plugin's file tree and text contents for the viewer.
 // Usage: node scripts/build-catalog.mjs [outDir]   (default: _site)
-import { mkdirSync, writeFileSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
 import { ROOT, MARKETPLACE, readJson, readYaml, pluginDir, join } from './lib.mjs';
 
 const outDir = join(ROOT, process.argv[2] || '_site');
+const MAX_TEXT_BYTES = 200 * 1024;
+
+// Every regular file under dir, as paths relative to dir with forward slashes. Symlinks are skipped.
+function listFiles(dir, prefix = '') {
+  return readdirSync(dir, { withFileTypes: true })
+    .sort((a, b) => a.name.localeCompare(b.name))
+    .flatMap(d => {
+      const rel = prefix + d.name;
+      if (d.isDirectory()) return listFiles(join(dir, d.name), rel + '/');
+      return d.isFile() ? [rel] : [];
+    });
+}
+
+// Text content for small non-binary files; null otherwise so the viewer can say why.
+function fileEntry(dir, rel) {
+  const full = join(dir, rel);
+  const size = statSync(full).size;
+  if (size > MAX_TEXT_BYTES) return { path: rel, size, content: null, reason: 'too large to preview' };
+  const buf = readFileSync(full);
+  if (buf.subarray(0, 8192).includes(0)) return { path: rel, size, content: null, reason: 'binary file' };
+  return { path: rel, size, content: buf.toString('utf8') };
+}
 
 function git(...args) {
   try {
@@ -22,10 +45,14 @@ function repoSlug() {
 const market = readJson(MARKETPLACE);
 const repo = repoSlug();
 
+mkdirSync(join(outDir, 'files'), { recursive: true });
+
 const plugins = market.plugins.map(entry => {
   const dir = pluginDir(entry);
   const manifest = readJson(join(dir, '.claude-plugin', 'plugin.json'));
   const meta = readYaml(join(dir, 'catalog.yaml'));
+  const files = listFiles(dir).map(rel => fileEntry(dir, rel));
+  writeFileSync(join(outDir, 'files', `${entry.name}.json`), JSON.stringify({ name: entry.name, files }) + '\n');
   return {
     name: entry.name,
     description: manifest.description || entry.description || '',
@@ -36,6 +63,7 @@ const plugins = market.plugins.map(entry => {
     useItWhen: meta.use_it_when || '',
     lastUpdated: git('log', '-1', '--format=%cI', '--', entry.source) || null,
     path: entry.source.replace(/^\.\//, ''),
+    fileCount: files.length,
     install: `claude plugin install ${entry.name}@${market.name}`,
   };
 });
@@ -50,6 +78,5 @@ const catalog = {
   plugins,
 };
 
-mkdirSync(outDir, { recursive: true });
 writeFileSync(join(outDir, 'catalog.json'), JSON.stringify(catalog, null, 2) + '\n');
-console.log(`✔ Wrote ${join(outDir, 'catalog.json')} (${plugins.length} plugins)`);
+console.log(`✔ Wrote ${join(outDir, 'catalog.json')} and files/ for ${plugins.length} plugins`);
