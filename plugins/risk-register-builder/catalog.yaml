@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: [risk, planning, project-management]
+jobs: [plan]
+works_with: [chat]
+use_it_when: "You need to list what could go wrong on a project and agree owners and next actions."
