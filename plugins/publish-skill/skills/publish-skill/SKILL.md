@@ -71,4 +71,4 @@ The PR body lists: what the skill does, owner, tier (Experimental), tags, and a 
 
 ## 6. Report
 
-Give the user the PR URL and say that CI runs the checks, and that if they pass and the skill bundles no code it is merged automatically; otherwise a reviewer merges it. The catalog page updates a few minutes after the merge. Then delete the temporary clone.
+Give the user the PR URL and say that CI runs the checks, and that if they pass and the skill bundles no code (and pre-approves no tools beyond `Read`, `Grep` and `Glob`) it is merged automatically; otherwise a reviewer merges it. The catalog page updates a few minutes after the merge. Then delete the temporary clone.

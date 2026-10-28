@@ -18,6 +18,25 @@ function baseNames() {
 }
 const existing = baseNames();
 
+// Installed copies only update when the version changes, so a plugin edited since the base branch
+// must raise its version. catalog.yaml is catalog data (tier, tags), not part of what users run.
+const BASE = process.env.CATALOG_BASE || 'origin/main';
+const git = (...args) => execFileSync('git', args, { cwd: ROOT, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+const newer = (a, b) => {
+  const [x, y] = [a, b].map(v => String(v).split(/[.+-]/).slice(0, 3).map(Number));
+  for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
+  return false;
+};
+function versionNotBumped(name, version) {
+  if (!existing?.has(name)) return null;
+  let changed, before;
+  try {
+    changed = git('diff', '--name-only', BASE, '--', `plugins/${name}`).split('\n').filter(f => f && !f.endsWith('/catalog.yaml'));
+    before = JSON.parse(git('show', `${BASE}:plugins/${name}/.claude-plugin/plugin.json`)).version;
+  } catch { return null; }
+  return changed.length && !newer(version, before) ? { before, changed } : null;
+}
+
 const market = readJson(MARKETPLACE);
 if (market.name !== 'skills-catalog') fail(`marketplace name must be "skills-catalog", got "${market.name}"`);
 if (!market.owner?.name) fail('marketplace owner.name is required');
@@ -43,6 +62,8 @@ for (const [i, entry] of (market.plugins || []).entries()) {
   const manifest = readJson(manifestPath);
   if (manifest.name !== entry.name) fail(`${at}: plugin.json name "${manifest.name}" does not match marketplace entry`);
   if (!manifest.version) fail(`${at}: plugin.json needs a version`);
+  const stale = manifest.version && versionNotBumped(entry.name, manifest.version);
+  if (stale) fail(`${at}: files changed (${stale.changed.join(', ')}) but the version is still ${manifest.version}; raise it above ${stale.before} in .claude-plugin/plugin.json so installed copies update`);
   if (!manifest.description) fail(`${at}: plugin.json needs a description`);
 
   const skillsDir = join(dir, 'skills');

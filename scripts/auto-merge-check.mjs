@@ -9,17 +9,20 @@ import { execFileSync } from 'node:child_process';
 import { appendFileSync } from 'node:fs';
 import { pathToFileURL } from 'node:url';
 import { parseYaml, NEW_TIER, NAME_RE } from './lib.mjs';
-import { capabilities } from './capabilities.mjs';
+import { capabilities, READ_ONLY_TOOLS } from './capabilities.mjs';
 import { LIMITS } from '../site/publish-core.mjs';
 
 const MARKET_PATH = '.claude-plugin/marketplace.json';
+// Files whose frontmatter can pre-approve tools; paths relative to the plugin root.
+const isFrontmatterFile = (p) => /^skills\/[^/]+\/SKILL\.md$/.test(p) || /^commands\/.+\.md$/.test(p);
 export const HOLD_LABEL = 'hold';
 
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 
 // Pure decision. pr: GitHub PR object; files: PR files list; baseMarket / headMarket: marketplace.json
-// at the merge base and at the PR head; mainNames: plugin names on main now; pluginJson / catalogYaml: text at head.
-export function decide({ pr, files, baseMarket, headMarket, mainNames, pluginJson, catalogYaml }) {
+// at the merge base and at the PR head; mainNames: plugin names on main now; pluginJson / catalogYaml: text at head;
+// texts: { filename: text } for the skill and command Markdown files at head (null if it could not be read).
+export function decide({ pr, files, baseMarket, headMarket, mainNames, pluginJson, catalogYaml, texts = {} }) {
   const reasons = [];
   const no = (msg) => reasons.push(msg);
 
@@ -69,9 +72,14 @@ export function decide({ pr, files, baseMarket, headMarket, mainNames, pluginJso
     if (pluginJson == null) no('plugin.json is missing');
     if (manifest) {
       const prefix = `plugins/${name}/`;
-      const pluginFiles = files.filter(f => f.filename.startsWith(prefix)).map(f => ({ path: f.filename.slice(prefix.length), content: '' }));
+      const pluginFiles = files.filter(f => f.filename.startsWith(prefix)).map(f => ({ path: f.filename.slice(prefix.length), content: texts[f.filename] ?? '' }));
+      const unread = pluginFiles.filter(f => isFrontmatterFile(f.path) && texts[prefix + f.path] == null);
+      if (unread.length) no(`could not read ${unread.map(f => f.path).join(', ')}`);
       const cap = capabilities(pluginFiles, manifest, name);
       if (cap.level === 'code') no(`it runs code (${cap.items.filter(i => i.kind === 'code').map(i => i.title).join(', ')}); a person reviews those`);
+      // Pre-approved tools run without asking the user, so only read-only ones merge without a person.
+      const risky = cap.tools.filter(t => !READ_ONLY_TOOLS.includes(t));
+      if (risky.length) no(`it pre-approves ${risky.join(', ')}, which ${risky.length === 1 ? 'runs' : 'run'} without asking; a person reviews those`);
     }
   }
 
@@ -125,6 +133,9 @@ function main() {
     mainNames: (jsonAt(repo, MARKET_PATH, 'main')?.plugins || []).map(p => p.name),
     pluginJson: name ? fileAt(headRepo, `plugins/${name}/.claude-plugin/plugin.json`, sha) : null,
     catalogYaml: name ? fileAt(headRepo, `plugins/${name}/catalog.yaml`, sha) : null,
+    texts: Object.fromEntries(files
+      .filter(f => name && f.filename.startsWith(`plugins/${name}/`) && isFrontmatterFile(f.filename.slice(`plugins/${name}/`.length)))
+      .map(f => [f.filename, fileAt(headRepo, f.filename, sha)])),
   });
 
   console.log(`PR #${pr.number} (${pr.title}) at ${sha.slice(0, 7)}`);
