@@ -69,6 +69,11 @@
       "name": "meeting-agenda-builder",
       "source": "./plugins/meeting-agenda-builder",
       "description": "Turns a meeting goal, length and attendees into a timed agenda with a clear outcome for each item. Use when someone asks for a meeting agenda, wants to plan a workshop or kickoff, or says \"help me run this meeting\"."
+    },
+    {
+      "name": "release-notes-checker",
+      "source": "./plugins/release-notes-checker",
+      "description": "Check draft release notes before publishing, for missing breaking changes, unclear wording, internal jargon and inconsistent formatting."
     }
   ]
 }

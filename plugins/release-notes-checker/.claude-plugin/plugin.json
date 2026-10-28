@@ -1,0 +1,15 @@
+{
+  "name": "release-notes-checker",
+  "version": "0.1.0",
+  "description": "Check draft release notes before publishing, for missing breaking changes, unclear wording, internal jargon and inconsistent formatting.",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "release",
+    "changelog",
+    "docs",
+    "review"
+  ]
+}
