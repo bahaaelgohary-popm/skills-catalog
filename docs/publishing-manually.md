@@ -95,7 +95,7 @@ works_with: [chat]
 use_it_when: One line on when to reach for it.
 ```
 
-Then add `{"name": "my-skill", "source": "./plugins/my-skill", "description": "..."}` at the end of `plugins` in `.claude-plugin/marketplace.json`. The folder name, the `plugin.json` name and the marketplace entry name must be identical. Keep catalog fields out of `SKILL.md` frontmatter. Optional `catalog.yaml` fields: `deprecated: true` and `replaced_by: <name>`.
+Then add `{"name": "my-skill", "source": "./plugins/my-skill", "description": "..."}` to `plugins` in `.claude-plugin/marketplace.json`, in alphabetical order (if your name sorts last, put it just before the last entry, so you don't edit an existing line and clash with other open PRs). The folder name, the `plugin.json` name and the marketplace entry name must be identical. Keep catalog fields out of `SKILL.md` frontmatter. Optional `catalog.yaml` fields: `deprecated: true` and `replaced_by: <name>`.
 
 ## When a check fails
 

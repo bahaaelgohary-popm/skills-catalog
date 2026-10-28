@@ -43,7 +43,7 @@ If `plugins/<name>` already exists on `main`, stop and ask whether this should b
 
 ## 3. Add the plugin
 
-From the clone root, run the repository's helper. It runs the same checks as the web publisher (naming, size limits, secrets), copies the folder to `plugins/<name>/skills/<name>/`, writes `plugin.json` and `catalog.yaml` (tier `Experimental`), and appends the marketplace entry:
+From the clone root, run the repository's helper. It runs the same checks as the web publisher (naming, size limits, secrets), copies the folder to `plugins/<name>/skills/<name>/`, writes `plugin.json` and `catalog.yaml` (tier `Experimental`), and inserts the marketplace entry in alphabetical order:
 
 ```bash
 node scripts/new-plugin.mjs --from "<skill folder>" --name <name> --owner "<owner>" --tags "<a,b,c>" --jobs "<ids>" --works-with "<ids>" --use-it-when "<one line>" --description "<one line>"
