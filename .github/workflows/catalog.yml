@@ -37,6 +37,9 @@ jobs:
           claude plugin validate . --strict
           for dir in plugins/*/; do claude plugin validate "$dir" --strict; done
 
+      - name: Unit tests (publisher, auto-merge rules, versions)
+        run: node --test tests/*.test.mjs
+
       - name: Catalog checks (catalog.yaml, names match)
         run: node scripts/check-catalog.mjs
 

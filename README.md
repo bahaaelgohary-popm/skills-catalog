@@ -37,6 +37,7 @@ plugins/<name>/
   skills/<name>/SKILL.md            the skill itself
   catalog.yaml                      catalog-only metadata: owner, tier, tags, jobs, works_with, use_it_when
 scripts/                            check-catalog, build-catalog, new-plugin (plain Node, no deps)
+tests/                              node:test unit tests for the publisher, auto-merge rules and versions
 site/index.html                     the marketplace: search, "I want to…", shelves, In review, Browse all with filters
 site/skill.html                     one page per skill: install, what it can do, files, version history
 site/publish.html                   the web publisher (editor and upload)
@@ -65,6 +66,7 @@ From a terminal without Claude Code, one command does all of it: `node scripts/n
 
 ```bash
 claude plugin validate . --strict
+node --test tests/*.test.mjs
 node scripts/check-catalog.mjs
 node scripts/build-catalog.mjs _site
 ```
