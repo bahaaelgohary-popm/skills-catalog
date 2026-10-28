@@ -29,6 +29,11 @@
       "name": "publish-skill",
       "source": "./plugins/publish-skill",
       "description": "Publish a skill to this catalog through a pull request"
-    }
+    },
+{
+  "name": "standup-summary",
+  "source": "./plugins/standup-summary",
+  "description": "Turn commits and notes into a three-line standup update"
+}
   ]
 }

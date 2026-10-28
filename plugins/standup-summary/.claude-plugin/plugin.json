@@ -1,0 +1,8 @@
+{
+  "name": "standup-summary",
+  "version": "0.1.0",
+  "description": "Turn commits and notes into a three-line standup update",
+  "author": { "name": "Bahaa" },
+  "license": "MIT",
+  "keywords": ["standup", "status", "team"]
+}
