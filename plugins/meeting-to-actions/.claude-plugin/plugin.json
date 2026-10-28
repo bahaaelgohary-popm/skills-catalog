@@ -1,0 +1,10 @@
+{
+  "name": "meeting-to-actions",
+  "version": "0.1.0",
+  "description": "Turn raw meeting notes or a transcript into decisions, action items with owners and dates, and open questions",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": ["meetings", "notes", "actions", "productivity"]
+}

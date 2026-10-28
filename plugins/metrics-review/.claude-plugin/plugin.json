@@ -1,0 +1,10 @@
+{
+  "name": "metrics-review",
+  "version": "0.1.0",
+  "description": "Review a product metric for clarity and gaming risk, and suggest paired guardrail metrics",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": ["product", "metrics", "kpi", "guardrails"]
+}

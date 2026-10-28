@@ -1,0 +1,71 @@
+---
+name: publish-skill
+description: Publish a local skill folder to the skills-catalog GitHub repository as a new plugin, through a branch and a pull request. Use when the user wants to add, share or publish a skill to the catalog.
+disable-model-invocation: true
+argument-hint: "[path-to-skill-folder]"
+---
+
+# Publish a skill to the catalog
+
+Publish a skill folder as a new plugin in the `skills-catalog` repository. Every change goes through a pull request. **Never push to `main`, never merge, never force-push.**
+
+## 1. Gather inputs
+
+Ask for anything not already given, in a single question:
+
+| Input | Rule |
+|---|---|
+| Skill folder | `$ARGUMENTS` if given. Must contain `SKILL.md`. |
+| Owner | Free text, a person or handle. Required. |
+| Lifecycle | `Pilot` or `GA`. Default `Pilot`. |
+| Tags | Optional, comma-separated. Suggest 2–4 from the SKILL.md content. |
+| Use it when | One line. Suggest one from the SKILL.md description. |
+| Catalog repo | Default `<gh login>/skills-catalog`, from `gh api user --jq .login`. |
+
+Read the `SKILL.md`. The plugin name is its frontmatter `name`, or the folder name if absent. It must be kebab-case (`a-z`, `0-9`, `-`). If not, propose a kebab-case name and confirm it.
+
+Stop and tell the user if: `gh auth status` fails, `git` or `node` is missing, or the folder contains anything that looks like a secret (API keys, tokens, `.env` files, private keys).
+
+## 2. Prepare a clean checkout
+
+Work in a fresh clone in a temporary directory so the user's current project is never touched:
+
+```bash
+gh repo clone <repo> <tmp>/skills-catalog
+cd <tmp>/skills-catalog
+git switch -c add-skill/<name>
+```
+
+If `plugins/<name>` already exists on `main`, stop and ask whether this should be an update instead (an update must bump `version` in its `plugin.json`).
+
+## 3. Add the plugin
+
+From the clone root, run the repository's helper, which copies the folder to `plugins/<name>/skills/<name>/`, writes `plugin.json` and `catalog.yaml`, and appends the marketplace entry:
+
+```bash
+node scripts/new-plugin.mjs --from "<skill folder>" --name <name> --owner "<owner>" --lifecycle <Pilot|GA> --tags "<a,b,c>" --use-it-when "<one line>" --description "<one line>"
+```
+
+## 4. Validate
+
+Both must pass before committing. Fix and re-run on failure; if you cannot fix it, stop and show the output.
+
+```bash
+claude plugin validate . --strict
+node scripts/check-catalog.mjs
+```
+
+## 5. Commit, push, open the PR
+
+```bash
+git add plugins/<name> .claude-plugin/marketplace.json
+git commit -m "Add <name> skill"
+git push -u origin add-skill/<name>
+gh pr create --base main --head add-skill/<name> --title "Add <name> skill" --body "<body>"
+```
+
+The PR body lists: what the skill does, owner, lifecycle, tags, and a checklist — `[x] claude plugin validate --strict passed`, `[x] catalog checks passed`, `[ ] reviewer tried the skill`.
+
+## 6. Report
+
+Give the user the PR URL and say that CI runs the checks, and that the catalog page updates after a reviewer merges it. Then delete the temporary clone.

@@ -1,0 +1,34 @@
+{
+  "name": "skills-catalog",
+  "description": "A small personal catalog of generic product and engineering skills for Claude Code",
+  "owner": {
+    "name": "Bahaa"
+  },
+  "plugins": [
+    {
+      "name": "prd-writer",
+      "source": "./plugins/prd-writer",
+      "description": "Turn a rough idea into a one-page PRD"
+    },
+    {
+      "name": "metrics-review",
+      "source": "./plugins/metrics-review",
+      "description": "Review a product metric and pair it with guardrail metrics"
+    },
+    {
+      "name": "changelog-from-commits",
+      "source": "./plugins/changelog-from-commits",
+      "description": "Write a user-facing changelog from git commits"
+    },
+    {
+      "name": "meeting-to-actions",
+      "source": "./plugins/meeting-to-actions",
+      "description": "Turn meeting notes into decisions, owners and dates"
+    },
+    {
+      "name": "publish-skill",
+      "source": "./plugins/publish-skill",
+      "description": "Publish a skill to this catalog through a pull request"
+    }
+  ]
+}

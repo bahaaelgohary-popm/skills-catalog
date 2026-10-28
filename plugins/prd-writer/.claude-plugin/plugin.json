@@ -1,0 +1,10 @@
+{
+  "name": "prd-writer",
+  "version": "1.0.0",
+  "description": "Turn a rough idea into a one-page PRD: problem, users, goals, non-goals, metrics and risks",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": ["product", "prd", "spec", "planning"]
+}

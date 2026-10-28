@@ -1,0 +1,10 @@
+{
+  "name": "changelog-from-commits",
+  "version": "1.0.0",
+  "description": "Write a user-facing changelog from a range of git commits",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": ["git", "changelog", "release", "docs"]
+}

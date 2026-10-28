@@ -1,0 +1,4 @@
+owner: Bahaa
+lifecycle: GA
+tags: [publishing, catalog, github, pull-request]
+use_it_when: You built a skill locally and want to add it to this catalog through a reviewed pull request.

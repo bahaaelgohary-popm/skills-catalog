@@ -1,0 +1,4 @@
+owner: Bahaa
+lifecycle: GA
+tags: [git, changelog, release, docs]
+use_it_when: You are cutting a release and need notes your users can read, not a commit dump.
