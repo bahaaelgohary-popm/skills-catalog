@@ -1,5 +1,6 @@
 #!/usr/bin/env bash
 # Read-only health check of a git repository. Usage: health-check.sh [repo-path]
+# Test edit: end-to-end update check.
 # Only reads files and runs read-only git commands; it never changes anything.
 set -u
 repo="${1:-.}"

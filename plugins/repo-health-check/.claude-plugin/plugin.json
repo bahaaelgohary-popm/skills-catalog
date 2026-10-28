@@ -1,7 +1,7 @@
 {
   "name": "repo-health-check",
-  "version": "0.1.0",
-  "description": "Check a repository for missing basics, large files, stale branches and open TODOs",
+  "version": "0.1.1",
+  "description": "Run a quick health check on a git repository (missing basics, large files, stale branches, open TODOs, uncommitted work) and turn the results into a short, prioritised to-do list. Use when someone asks how healthy a repo is, or before handing a repo over.",
   "author": {
     "name": "Bahaa"
   },
