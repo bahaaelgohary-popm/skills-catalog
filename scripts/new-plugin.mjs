@@ -8,8 +8,8 @@
 import { readdirSync, readFileSync, mkdirSync, writeFileSync } from 'node:fs';
 import { resolve, dirname, relative } from 'node:path';
 import { execFileSync, execSync } from 'node:child_process';
-import { ROOT, MARKETPLACE, readJson, existsSync, join } from './lib.mjs';
-import { normalizeUpload, parseFrontmatter, runChecks, buildPluginFiles, addMarketplaceEntry, bytesToText, tagsFrom, NEW_TIER } from '../site/publish-core.mjs';
+import { ROOT, MARKETPLACE, readJson, existsSync, join, ghApi } from './lib.mjs';
+import { normalizeUpload, parseFrontmatter, runChecks, buildPluginFiles, addMarketplaceEntry, bytesToText, tagsFrom, openPullRequestAdding, NEW_TIER } from '../site/publish-core.mjs';
 
 // "--key value" pairs; a key with no value (like --pr) is true.
 const args = {};
@@ -64,6 +64,8 @@ if (args.pr) {
   let email = '';
   try { email = run('git', ['config', 'user.email']); } catch {}
   if (!email) die('Set the name and email to publish under first, e.g. your GitHub noreply address:\n  git config --global user.name "<github-login>"\n  git config --global user.email "<id>+<github-login>@users.noreply.github.com"');
+  const open = await openPullRequestAdding({ api: ghApi, repo: run('gh', ['repo', 'view', '--json', 'nameWithOwner', '--jq', '.nameWithOwner']), name });
+  if (open) die(`"${name}" is already proposed in pull request #${open.number} (${open.url}); update that one or pick another name with --name`);
   let previous;
   try { previous = ['switch', '--quiet', run('git', ['symbolic-ref', '--quiet', '--short', 'HEAD'])]; }
   catch { previous = ['switch', '--quiet', '--detach', run('git', ['rev-parse', 'HEAD'])]; }

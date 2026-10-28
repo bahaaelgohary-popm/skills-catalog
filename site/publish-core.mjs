@@ -177,6 +177,21 @@ export function addMarketplaceEntry(marketText, { name, description }) {
 
 export const tagsFrom = (s) => (s || '').split(',').map(t => t.trim().toLowerCase()).filter(Boolean);
 
+// Finds an open pull request that already proposes plugins/<name>/ (any route, any branch name).
+// Returns { number, url } or null. Skips `exclude`; with `before`, only looks at older pull requests.
+export async function openPullRequestAdding({ api, repo, name, exclude, before }) {
+  const list = await api('GET', `/repos/${repo}/pulls?state=open&sort=created&direction=asc&per_page=100`);
+  if (list.status >= 300) throw new Error(`Listing open pull requests failed (HTTP ${list.status})`);
+  for (const pr of list.data) {
+    if (pr.number === exclude || (before && pr.number >= before)) continue;
+    const headRepo = pr.head.repo?.full_name;
+    if (!headRepo) continue;
+    const r = await api('GET', `/repos/${headRepo}/contents/plugins/${name}/.claude-plugin/plugin.json?ref=${pr.head.sha}`);
+    if (r.status === 200) return { number: pr.number, url: pr.html_url };
+  }
+  return null;
+}
+
 // Opens a pull request with the plugin through the GitHub REST API.
 // api(method, path, body) must resolve to { status, data }; the browser passes a fetch wrapper, tests pass `gh api`.
 // baseBranch defaults to the repository's default branch.
@@ -192,6 +207,8 @@ export async function publishToGitHub({ api, repo, plugin, via, baseBranch, onSt
     const market = must(await api('GET', `/repos/${repo}/contents/.claude-plugin/marketplace.json?ref=${base}`), 'Reading marketplace.json');
     const exists = await api('GET', `/repos/${repo}/contents/plugins/${plugin.name}?ref=${base}`);
     if (exists.status === 200) throw new Error(`plugins/${plugin.name} already exists on ${base}`);
+    const open = await openPullRequestAdding({ api, repo, name: plugin.name });
+    if (open) throw new Error(`"${plugin.name}" is already proposed in pull request #${open.number} (${open.url}); update that one or pick another name`);
     return { base, baseSha: ref.object.sha, baseTree: commit.tree.sha, marketText: bytesToText(fromBase64(market.content)) };
   });
 

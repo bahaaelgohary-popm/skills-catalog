@@ -2,6 +2,7 @@
 import { readFileSync, existsSync } from 'node:fs';
 import { join, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
+import { execFileSync } from 'node:child_process';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const MARKETPLACE = join(ROOT, '.claude-plugin', 'marketplace.json');
@@ -53,6 +54,18 @@ export function readYaml(path) {
 
 export function pluginDir(entry) {
   return join(ROOT, entry.source.replace(/^\.\//, ''));
+}
+
+// The publisher's api(method, path) interface over the gh CLI (GH_TOKEN in Actions, your login locally).
+export function ghApi(method, path) {
+  try {
+    const out = execFileSync('gh', ['api', '-X', method, path], { encoding: 'utf8', stdio: ['ignore', 'pipe', 'pipe'], maxBuffer: 32 << 20 });
+    return { status: 200, data: out ? JSON.parse(out) : null };
+  } catch (e) {
+    const status = Number((e.stderr || '').match(/HTTP (\d{3})/)?.[1]);
+    if (status) return { status, data: null };
+    throw e;
+  }
 }
 
 export { existsSync, join };
