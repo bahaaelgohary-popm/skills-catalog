@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: [release, changelog, docs, review]
+jobs: [ship]
+works_with: [chat, files]
+use_it_when: "You have a draft of release notes and want it checked before you publish."
