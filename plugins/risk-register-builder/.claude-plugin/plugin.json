@@ -1,0 +1,14 @@
+{
+  "name": "risk-register-builder",
+  "version": "0.1.0",
+  "description": "Turns a project description or a list of worries into a scored risk register with an owner and a next action for each risk. Use when someone asks for a risk register, a risk assessment, \"what could go wrong\", or wants to prepare risks for a planning or steering meeting.",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "risk",
+    "planning",
+    "project-management"
+  ]
+}
