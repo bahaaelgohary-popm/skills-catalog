@@ -64,6 +64,11 @@
       "name": "retro-facilitator",
       "source": "./plugins/retro-facilitator",
       "description": "Run a team retrospective from raw notes or sticky-note dumps, grouping themes and turning them into a few owned improvement actions. Use after a sprint, project or incident when a team wants to reflect and improve."
+    },
+    {
+      "name": "meeting-agenda-builder",
+      "source": "./plugins/meeting-agenda-builder",
+      "description": "Turns a meeting goal, length and attendees into a timed agenda with a clear outcome for each item. Use when someone asks for a meeting agenda, wants to plan a workshop or kickoff, or says \"help me run this meeting\"."
     }
   ]
 }
