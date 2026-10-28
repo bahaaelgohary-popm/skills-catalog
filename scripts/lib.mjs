@@ -56,6 +56,14 @@ export function pluginDir(entry) {
   return join(ROOT, entry.source.replace(/^\.\//, ''));
 }
 
+// Semantic versions: true if a is higher than b (x.y.z; anything after - or + is ignored).
+export function isNewerVersion(a, b) {
+  const [x, y] = [a, b].map(v => String(v).split(/[.+-]/).slice(0, 3).map(Number));
+  for (let i = 0; i < 3; i++) if ((x[i] || 0) !== (y[i] || 0)) return (x[i] || 0) > (y[i] || 0);
+  return false;
+}
+export const nextPatch = (v) => { const [a = 0, b = 0, c = 0] = String(v).split(/[.+-]/).map(Number); return `${a}.${b}.${c + 1}`; };
+
 // The publisher's api(method, path) interface over the gh CLI (GH_TOKEN in Actions, your login locally).
 export function ghApi(method, path) {
   try {

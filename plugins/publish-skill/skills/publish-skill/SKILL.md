@@ -39,7 +39,13 @@ cd <tmp>/skills-catalog
 git switch -c add-skill/<name>
 ```
 
-If `plugins/<name>` already exists on `main`, stop and ask whether this should be an update instead (an update must bump `version` in its `plugin.json`).
+If `plugins/<name>` already exists on `main`, ask the user to confirm this is an update to their published skill. If it is, skip steps 3 to 5 and run, from the clone root:
+
+```bash
+node scripts/new-plugin.mjs --from "<skill folder>" --update
+```
+
+It replaces the files in `plugins/<name>/skills/<name>/`, raises the patch version in `plugin.json` (add `--version x.y.z` for a bigger step), keeps `catalog.yaml` and the catalog description (add `--description "..."` to change it), runs the same checks, commits, pushes `update-skill/<name>` and opens the pull request. It stops if another open pull request already changes that plugin. Then go to step 6, and say that updates always wait for a reviewer.
 
 ## 3. Add the plugin
 
