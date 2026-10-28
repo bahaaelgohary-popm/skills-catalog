@@ -6,34 +6,9 @@
   },
   "plugins": [
     {
-      "name": "prd-writer",
-      "source": "./plugins/prd-writer",
-      "description": "Turn a rough idea into a one-page PRD"
-    },
-    {
-      "name": "metrics-review",
-      "source": "./plugins/metrics-review",
-      "description": "Review a product metric and pair it with guardrail metrics"
-    },
-    {
       "name": "changelog-from-commits",
       "source": "./plugins/changelog-from-commits",
       "description": "Write a user-facing changelog from git commits"
-    },
-    {
-      "name": "meeting-to-actions",
-      "source": "./plugins/meeting-to-actions",
-      "description": "Turn meeting notes into decisions, owners and dates"
-    },
-    {
-      "name": "publish-skill",
-      "source": "./plugins/publish-skill",
-      "description": "Publish a skill to this catalog through a pull request"
-    },
-    {
-      "name": "standup-summary",
-      "source": "./plugins/standup-summary",
-      "description": "Turn commits and notes into a three-line standup update"
     },
     {
       "name": "code-review-checklist",
@@ -41,29 +16,9 @@
       "description": "Review a change against a practical checklist and report findings by severity"
     },
     {
-      "name": "repo-health-check",
-      "source": "./plugins/repo-health-check",
-      "description": "Check a repository for missing basics, large files, stale branches and open TODOs"
-    },
-    {
-      "name": "user-story-splitter",
-      "source": "./plugins/user-story-splitter",
-      "description": "Split a large story into thin, shippable slices with acceptance criteria"
-    },
-    {
-      "name": "test-plan-writer",
-      "source": "./plugins/test-plan-writer",
-      "description": "Write a risk-based test plan with cases by level, test data and exit criteria"
-    },
-    {
       "name": "incident-postmortem",
       "source": "./plugins/incident-postmortem",
       "description": "Blameless incident postmortems: a writer skill plus a timeline-builder agent that turns messy logs into a clean timeline"
-    },
-    {
-      "name": "retro-facilitator",
-      "source": "./plugins/retro-facilitator",
-      "description": "Run a team retrospective from raw notes or sticky-note dumps, grouping themes and turning them into a few owned improvement actions. Use after a sprint, project or incident when a team wants to reflect and improve."
     },
     {
       "name": "meeting-agenda-builder",
@@ -71,9 +26,54 @@
       "description": "Turns a meeting goal, length and attendees into a timed agenda with a clear outcome for each item. Use when someone asks for a meeting agenda, wants to plan a workshop or kickoff, or says \"help me run this meeting\"."
     },
     {
+      "name": "meeting-to-actions",
+      "source": "./plugins/meeting-to-actions",
+      "description": "Turn meeting notes into decisions, owners and dates"
+    },
+    {
+      "name": "metrics-review",
+      "source": "./plugins/metrics-review",
+      "description": "Review a product metric and pair it with guardrail metrics"
+    },
+    {
+      "name": "prd-writer",
+      "source": "./plugins/prd-writer",
+      "description": "Turn a rough idea into a one-page PRD"
+    },
+    {
+      "name": "publish-skill",
+      "source": "./plugins/publish-skill",
+      "description": "Publish a skill to this catalog through a pull request"
+    },
+    {
+      "name": "repo-health-check",
+      "source": "./plugins/repo-health-check",
+      "description": "Check a repository for missing basics, large files, stale branches and open TODOs"
+    },
+    {
+      "name": "retro-facilitator",
+      "source": "./plugins/retro-facilitator",
+      "description": "Run a team retrospective from raw notes or sticky-note dumps, grouping themes and turning them into a few owned improvement actions. Use after a sprint, project or incident when a team wants to reflect and improve."
+    },
+    {
       "name": "risk-register-builder",
       "source": "./plugins/risk-register-builder",
       "description": "Turns a project description or a list of worries into a scored risk register with an owner and a next action for each risk. Use when someone asks for a risk register, a risk assessment, \"what could go wrong\", or wants to prepare risks for a planning or steering meeting."
+    },
+    {
+      "name": "standup-summary",
+      "source": "./plugins/standup-summary",
+      "description": "Turn commits and notes into a three-line standup update"
+    },
+    {
+      "name": "test-plan-writer",
+      "source": "./plugins/test-plan-writer",
+      "description": "Write a risk-based test plan with cases by level, test data and exit criteria"
+    },
+    {
+      "name": "user-story-splitter",
+      "source": "./plugins/user-story-splitter",
+      "description": "Split a large story into thin, shippable slices with acceptance criteria"
     }
   ]
 }
