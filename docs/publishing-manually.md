@@ -1,7 +1,7 @@
 # Publishing a skill manually
 
 > [!NOTE]
-> Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.
+> Drafted with AI assistance (Claude Code). The solution is reviewed; this document's wording is still being reviewed.
 
 How to write a skill in Claude Code, test it, and publish it to this catalog from your terminal. The examples use a skill called `my-skill`; replace it with your own name.
 

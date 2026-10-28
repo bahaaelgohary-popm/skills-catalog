@@ -1,7 +1,7 @@
 # Skills Catalog
 
 > [!NOTE]
-> Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.
+> Drafted with AI assistance (Claude Code). The solution is reviewed; this document's wording is still being reviewed.
 
 A small catalog of generic Claude Code skills, each packaged as a plugin in a plugin marketplace. This repository is the source of truth: a GitHub Action checks every change, generates `catalog.json`, and publishes a searchable page to GitHub Pages.
 
