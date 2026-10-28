@@ -1,7 +1,8 @@
 name: Auto-merge new skills
 
 # After the Catalog checks pass on a pull request, merge it without a person if it only adds
-# one new Experimental plugin with no bundled code (scripts/auto-merge-check.mjs decides).
+# one new Experimental plugin with no bundled code and no pre-approved tools beyond read-only ones
+# (scripts/auto-merge-check.mjs decides).
 # Everything else, and any PR labelled "hold", waits for a reviewer.
 # This workflow always runs from main and never checks out or runs the PR's code.
 

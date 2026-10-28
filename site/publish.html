@@ -210,7 +210,7 @@
 <div class="wrap">
   <a class="back" href="./">← Skills Marketplace</a>
   <h1>Publish a skill</h1>
-  <p class="lead">Every way of publishing opens a pull request. Checks run on it. If they pass and the skill bundles no code, it merges automatically and appears in the marketplace as <strong>Experimental</strong> within a few minutes. Skills that run code wait for a reviewer.</p>
+  <p class="lead">Every way of publishing opens a pull request. Checks run on it. If they pass and the skill bundles no code, it merges automatically and appears in the marketplace as <strong>Experimental</strong> within a few minutes. Skills that run code, or pre-approve tools beyond reading files, wait for a reviewer.</p>
 
   <p class="notice">This is a lab version: publishing is limited to the owner's account for now. You can still try the editor, the upload and the pre-publish checks; only the final step needs access to the repository.</p>
 
@@ -548,7 +548,7 @@ $('publish').addEventListener('click', async () => {
     });
     state.existing.push(plugin.name);
     showResult(true, `<strong>Pull request <a href="${esc(pr.url)}" target="_blank" rel="noopener">#${pr.number}</a> is open.</strong>
-      <ol><li>Checks run on it (validation, catalog rules, secret scan).</li><li>If they pass and the skill bundles no code, it merges automatically. Skills that run code wait for a reviewer.</li><li>The catalog page updates within a couple of minutes of the merge.</li></ol>
+      <ol><li>Checks run on it (validation, catalog rules, secret scan).</li><li>If they pass and the skill bundles no code, it merges automatically. Skills that run code, or pre-approve tools beyond reading files, wait for a reviewer.</li><li>The catalog page updates within a couple of minutes of the merge.</li></ol>
       <p><a href="./#in-review">See it under “In review” in the marketplace →</a></p>`);
     if (state.mode === 'write') store.set('localStorage', 'publish-draft', null);
   } catch (err) {

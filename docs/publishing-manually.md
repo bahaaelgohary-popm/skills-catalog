@@ -62,7 +62,7 @@ If any check fails, it undoes the branch and nothing is pushed. Fix the problem 
 
 ## 4. What happens next
 
-CI runs the checks on the PR. If they pass and the skill bundles no code ("Instructions only" or "Pre-approved tools"), it is **merged automatically** about a minute later. Skills with scripts, hooks or MCP servers wait for a reviewer. The [catalog page](https://bahaaelgohary-popm.github.io/skills-catalog/) updates a minute or two after the merge. Then install it:
+CI runs the checks on the PR. If they pass and the skill bundles no code ("Instructions only", or pre-approves only the read-only `Read`, `Grep` and `Glob`), it is **merged automatically** about a minute later. Skills with scripts, hooks or MCP servers, and skills that pre-approve other tools such as `Bash` or `Write` (they run without asking), wait for a reviewer. The [catalog page](https://bahaaelgohary-popm.github.io/skills-catalog/) updates a minute or two after the merge. Then install it:
 
 ```bash
 claude plugin marketplace update skills-catalog
@@ -73,7 +73,7 @@ Run it as `/my-skill:my-skill`; plugin skills always carry the `plugin:skill` pr
 
 ## Updating a published skill
 
-Branch from `main`, edit the files under `plugins/my-skill/`, and **bump `version` in `.claude-plugin/plugin.json`** (for example `0.1.0` → `0.2.0`). Installed copies stay on their version until it changes. Then commit and open a PR with `gh pr create`. Edits to existing skills always go to a reviewer. To promote a skill, change `tier: Experimental` to `Recommended` in its `catalog.yaml`.
+Branch from `main`, edit the files under `plugins/my-skill/`, and **bump `version` in `.claude-plugin/plugin.json`** (for example `0.1.0` → `0.2.0`). Installed copies stay on their version until it changes, so CI fails an edit that doesn't raise it (changes to `catalog.yaml` alone don't need a bump). Then commit and open a PR with `gh pr create`. Edits to existing skills always go to a reviewer. To promote a skill, change `tier: Experimental` to `Recommended` in its `catalog.yaml`.
 
 ## What the script writes
 
