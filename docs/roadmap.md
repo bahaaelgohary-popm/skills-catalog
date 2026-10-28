@@ -1,7 +1,7 @@
 # Roadmap
 
 > [!NOTE]
-> Generated with AI assistance (Claude Code) and still pending human review. Validate the content before relying on it.
+> Drafted with AI assistance (Claude Code). The solution is reviewed; this document's wording is still being reviewed.
 
 What this lab would need to become a product people rely on. Each item says what changes for users and how we'd know it worked.
 
