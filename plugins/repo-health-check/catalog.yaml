@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: [git, maintenance, hygiene]
+jobs: [maintain]
+works_with: [git, terminal]
+use_it_when: "You inherit or hand over a repository and want a quick list of what needs attention."

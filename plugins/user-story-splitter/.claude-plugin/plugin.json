@@ -1,0 +1,14 @@
+{
+  "name": "user-story-splitter",
+  "version": "0.1.0",
+  "description": "Split a large story into thin, shippable slices with acceptance criteria",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "agile",
+    "stories",
+    "planning"
+  ]
+}

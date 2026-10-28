@@ -35,9 +35,9 @@ Browse everything, with tiers and files, on the catalog page.
 plugins/<name>/
   .claude-plugin/plugin.json        plugin manifest (name must match the entry)
   skills/<name>/SKILL.md            the skill itself
-  catalog.yaml                      catalog-only metadata: owner, tier, tags, use_it_when
+  catalog.yaml                      catalog-only metadata: owner, tier, tags, jobs, works_with, use_it_when
 scripts/                            check-catalog, build-catalog, new-plugin (plain Node, no deps)
-site/index.html                     the catalog page, with live "In review" submissions (plain HTML/CSS/JS)
+site/index.html                     the marketplace: search, "I want to…", shelves, In review, Browse all with filters
 site/skill.html                     one page per skill: install, what it can do, files, version history
 site/publish.html                   the web publisher (editor and upload)
 site/publish-core.mjs               publishing logic shared by the web publisher and new-plugin.mjs
@@ -54,7 +54,7 @@ Catalog metadata lives in `catalog.yaml`, not in `SKILL.md` frontmatter, so `cla
    - **Web upload:** on the same page, drop loose files, a folder, or a `.zip` with the skill folder inside.
 
    The web publisher runs the same checks as the CLI in the browser and opens the PR through the GitHub API with a fine-grained token you paste (kept only in that tab; needs Contents and Pull requests read/write on this repo).
-2. **Checks.** The Action runs on the PR: `claude plugin validate --strict`, catalog checks (every plugin has `catalog.yaml` with owner and tier; names match the marketplace entry; no unlisted folders; new plugins start as Experimental), a gitleaks secret scan, and a test build of `catalog.json`.
+2. **Checks.** The Action runs on the PR: `claude plugin validate --strict`, catalog checks (every plugin has `catalog.yaml` with owner, tier, jobs and works_with from the allowed lists; names match the marketplace entry; no unlisted folders; new plugins start as Experimental), a gitleaks secret scan, and a test build of `catalog.json`.
 3. **Merge.** A reviewer reads the skill and merges.
 4. **Catalog updates.** On `main`, the same Action regenerates `catalog.json` (including each plugin's last commit date) and redeploys the page. Users get the new plugin with `claude plugin marketplace update skills-catalog`.
 

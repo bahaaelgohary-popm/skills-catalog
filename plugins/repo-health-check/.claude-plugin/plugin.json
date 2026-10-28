@@ -1,0 +1,14 @@
+{
+  "name": "repo-health-check",
+  "version": "0.1.0",
+  "description": "Check a repository for missing basics, large files, stale branches and open TODOs",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "git",
+    "maintenance",
+    "hygiene"
+  ]
+}

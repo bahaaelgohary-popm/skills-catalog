@@ -30,10 +30,35 @@
       "source": "./plugins/publish-skill",
       "description": "Publish a skill to this catalog through a pull request"
     },
-{
-  "name": "standup-summary",
-  "source": "./plugins/standup-summary",
-  "description": "Turn commits and notes into a three-line standup update"
-}
+    {
+      "name": "standup-summary",
+      "source": "./plugins/standup-summary",
+      "description": "Turn commits and notes into a three-line standup update"
+    },
+    {
+      "name": "code-review-checklist",
+      "source": "./plugins/code-review-checklist",
+      "description": "Review a change against a practical checklist and report findings by severity"
+    },
+    {
+      "name": "repo-health-check",
+      "source": "./plugins/repo-health-check",
+      "description": "Check a repository for missing basics, large files, stale branches and open TODOs"
+    },
+    {
+      "name": "user-story-splitter",
+      "source": "./plugins/user-story-splitter",
+      "description": "Split a large story into thin, shippable slices with acceptance criteria"
+    },
+    {
+      "name": "test-plan-writer",
+      "source": "./plugins/test-plan-writer",
+      "description": "Write a risk-based test plan with cases by level, test data and exit criteria"
+    },
+    {
+      "name": "incident-postmortem",
+      "source": "./plugins/incident-postmortem",
+      "description": "Blameless incident postmortems: a writer skill plus a timeline-builder agent that turns messy logs into a clean timeline"
+    }
   ]
 }

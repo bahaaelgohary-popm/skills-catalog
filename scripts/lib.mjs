@@ -5,9 +5,8 @@ import { fileURLToPath } from 'node:url';
 
 export const ROOT = join(dirname(fileURLToPath(import.meta.url)), '..');
 export const MARKETPLACE = join(ROOT, '.claude-plugin', 'marketplace.json');
-export const TIERS = ['Experimental', 'Recommended'];
-export const NEW_TIER = 'Experimental'; // every newly published plugin starts here
-export const NAME_RE = /^[a-z0-9][a-z0-9-]*$/;
+// Tiers, name rule and vocabularies live in the publisher module the browser also uses.
+export { TIERS, NEW_TIER, NAME_RE, JOBS, WORKS_WITH } from '../site/publish-core.mjs';
 
 export function readJson(path) {
   return JSON.parse(readFileSync(path, 'utf8'));

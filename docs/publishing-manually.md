@@ -82,7 +82,7 @@ plugins/my-skill/
 **Shortcut:** the helper script does steps 5a–5d in one command:
 
 ```bash
-node scripts/new-plugin.mjs --from ~/.claude/skills/my-skill --name my-skill --owner "Your Name" --tags "tag1,tag2" --use-it-when "One line on when to reach for it."
+node scripts/new-plugin.mjs --from ~/.claude/skills/my-skill --name my-skill --owner "Your Name" --tags "tag1,tag2" --jobs "plan" --works-with "chat" --use-it-when "One line on when to reach for it."
 ```
 
 Or by hand:
@@ -115,8 +115,12 @@ PowerShell: `mkdir plugins\my-skill\.claude-plugin` then `Copy-Item -Recurse "$H
 owner: Your Name
 tier: Experimental
 tags: [tag1, tag2]
+jobs: [plan]
+works_with: [chat]
 use_it_when: One line on when to reach for it.
 ```
+
+`jobs` (what it helps with) must use ids from: `plan`, `review`, `ship`, `meetings`, `incidents`, `maintain`, `share`. `works_with` must use: `chat`, `files`, `git`, `github`, `terminal`. Both lists are defined in `site/publish-core.mjs` and power the marketplace's "I want to…" chips and "Works with" filter. Optional: `deprecated: true` and `replaced_by: <name>`.
 
 New skills must start as `Experimental` (CI enforces this). A reviewer promotes a skill to `Recommended` later with a one-line PR.
 
@@ -182,7 +186,8 @@ Same flow: branch, edit, PR. **Always bump `version` in `plugin.json`** (for exa
 | Error | Fix |
 |---|---|
 | `plugin.json name "x" does not match marketplace entry` | Make the folder, `plugin.json` name and marketplace entry name identical |
-| `missing catalog.yaml` or `needs owner` | Add `catalog.yaml` with `owner`, `tier`, `use_it_when` |
+| `missing catalog.yaml` or `needs owner` | Add `catalog.yaml` with `owner`, `tier`, `jobs`, `works_with`, `use_it_when` |
+| `jobs` / `works_with` must be a non-empty list | Add at least one allowed id (see step 5c) |
 | `tier must be one of Experimental, Recommended` | Values are case-sensitive |
 | `new plugins start as Experimental` | Set `tier: Experimental`; promote in a later PR |
 | `plugins/x is not listed in marketplace.json` | Add the marketplace entry (step 5d) |

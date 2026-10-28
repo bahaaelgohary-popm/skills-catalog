@@ -4,7 +4,7 @@
 // Base branch: $CATALOG_BASE (default origin/main); the "new plugin" rule is skipped if it can't be read.
 import { readdirSync, statSync } from 'node:fs';
 import { execFileSync } from 'node:child_process';
-import { ROOT, MARKETPLACE, TIERS, NEW_TIER, NAME_RE, readJson, readYaml, pluginDir, existsSync, join } from './lib.mjs';
+import { ROOT, MARKETPLACE, TIERS, NEW_TIER, NAME_RE, JOBS, WORKS_WITH, readJson, readYaml, pluginDir, existsSync, join } from './lib.mjs';
 
 const errors = [];
 const fail = (msg) => errors.push(msg);
@@ -24,6 +24,7 @@ if (!market.owner?.name) fail('marketplace owner.name is required');
 if (!Array.isArray(market.plugins) || market.plugins.length === 0) fail('marketplace has no plugins');
 
 const listed = new Set();
+const replacements = [];
 for (const [i, entry] of (market.plugins || []).entries()) {
   const at = `plugins[${i}] "${entry.name}"`;
   if (!NAME_RE.test(entry.name || '')) fail(`${at}: name must be kebab-case`);
@@ -57,7 +58,18 @@ for (const [i, entry] of (market.plugins || []).entries()) {
   else if (existing && !existing.has(entry.name) && meta.tier !== NEW_TIER) fail(`${at}: new plugins start as ${NEW_TIER}; promote in a later PR`);
   if (!meta.use_it_when) fail(`${at}: catalog.yaml needs use_it_when`);
   if (meta.tags !== undefined && !Array.isArray(meta.tags)) fail(`${at}: catalog.yaml tags must be a list`);
+  const vocab = (field, list) => {
+    const v = meta[field];
+    if (!Array.isArray(v) || v.length === 0) return fail(`${at}: catalog.yaml ${field} must be a non-empty list of: ${list.map(x => x.id).join(', ')}`);
+    for (const x of v) if (!list.some(l => l.id === x)) fail(`${at}: catalog.yaml ${field} has unknown value "${x}" (allowed: ${list.map(l => l.id).join(', ')})`);
+  };
+  vocab('jobs', JOBS);
+  vocab('works_with', WORKS_WITH);
+  if (meta.deprecated !== undefined && !['true', 'false'].includes(meta.deprecated)) fail(`${at}: catalog.yaml deprecated must be true or false`);
+  if (meta.replaced_by) replacements.push([at, meta.replaced_by]);
 }
+
+for (const [at, target] of replacements) if (!listed.has(target)) fail(`${at}: replaced_by "${target}" is not in the marketplace`);
 
 // Every folder in plugins/ must be listed, so nothing ships unreviewed or gets forgotten.
 const pluginsRoot = join(ROOT, 'plugins');

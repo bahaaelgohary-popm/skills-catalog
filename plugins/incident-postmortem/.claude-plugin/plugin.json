@@ -1,0 +1,14 @@
+{
+  "name": "incident-postmortem",
+  "version": "0.1.0",
+  "description": "Blameless incident postmortems: a writer skill plus a timeline-builder agent that turns messy logs into a clean timeline",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": [
+    "incidents",
+    "postmortem",
+    "reliability"
+  ]
+}

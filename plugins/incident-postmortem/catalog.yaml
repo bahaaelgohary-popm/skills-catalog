@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: [incidents, postmortem, reliability]
+jobs: [incidents]
+works_with: [chat, files]
+use_it_when: "An incident is over and you need a clear, blameless write-up with owned follow-ups."

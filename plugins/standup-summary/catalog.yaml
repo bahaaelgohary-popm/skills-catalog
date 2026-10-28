@@ -1,4 +1,6 @@
 owner: Bahaa
 tier: Experimental
 tags: [standup, status, team]
+jobs: [meetings]
+works_with: [chat, git]
 use_it_when: You need a quick daily update from your commits or notes.
