@@ -161,10 +161,15 @@ git push -u origin add-skill/my-skill
 gh pr create --base main --title "Add my-skill skill" --body "Owner: Your Name. Tier: Experimental. Validated locally."
 ```
 
-### 9. Wait for checks, review, merge
+### 9. Wait for checks and the merge
 
 ```bash
 gh pr checks --watch
+```
+
+If the checks pass and the PR only adds your new Experimental plugin with no bundled code, it is merged automatically a minute later. Otherwise (for example the skill includes scripts) a reviewer merges it:
+
+```bash
 gh pr merge --squash --delete-branch
 ```
 

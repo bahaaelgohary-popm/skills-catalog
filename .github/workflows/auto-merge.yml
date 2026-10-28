@@ -1,0 +1,63 @@
+name: Auto-merge new skills
+
+# After the Catalog checks pass on a pull request, merge it without a person if it only adds
+# one new Experimental plugin with no bundled code (scripts/auto-merge-check.mjs decides).
+# Everything else, and any PR labelled "hold", waits for a reviewer.
+# This workflow always runs from main and never checks out or runs the PR's code.
+
+on:
+  workflow_run:
+    workflows: [Catalog]
+    types: [completed]
+
+permissions:
+  contents: write
+  pull-requests: write
+  actions: write
+
+concurrency:
+  group: auto-merge
+  cancel-in-progress: false
+
+jobs:
+  merge:
+    name: Merge if eligible
+    if: github.event.workflow_run.event == 'pull_request' && github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      REPO: ${{ github.repository }}
+    steps:
+      - uses: actions/checkout@v4 # main, not the PR
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Check eligibility
+        id: check
+        env:
+          HEAD_SHA: ${{ github.event.workflow_run.head_sha }}
+        shell: bash # pipefail, so a failing check fails the step
+        run: node scripts/auto-merge-check.mjs | tee -a "$GITHUB_STEP_SUMMARY"
+
+      - name: Squash-merge
+        if: steps.check.outputs.eligible == 'true'
+        env:
+          PR: ${{ steps.check.outputs.pr }}
+          SHA: ${{ steps.check.outputs.sha }}
+          NAME: ${{ steps.check.outputs.name }}
+        run: |
+          gh pr merge "$PR" --repo "$REPO" --squash --match-head-commit "$SHA"
+          gh pr comment "$PR" --repo "$REPO" --body "Merged automatically: adds the new Experimental skill \`$NAME\`, all checks passed, and it bundles no code. A reviewer can promote it to Recommended later."
+
+      - name: Delete the branch
+        if: steps.check.outputs.eligible == 'true' && steps.check.outputs.same_repo == 'true'
+        env:
+          BRANCH: ${{ steps.check.outputs.branch }}
+        run: gh api -X DELETE "repos/$REPO/git/refs/heads/$BRANCH" || true
+
+      # A merge made with GITHUB_TOKEN does not trigger the push workflow, so start the deploy here.
+      - name: Redeploy the catalog
+        if: steps.check.outputs.eligible == 'true'
+        run: gh workflow run catalog.yml --repo "$REPO" --ref main

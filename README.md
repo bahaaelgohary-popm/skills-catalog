@@ -42,6 +42,7 @@ site/skill.html                     one page per skill: install, what it can do,
 site/publish.html                   the web publisher (editor and upload)
 site/publish-core.mjs               publishing logic shared by the web publisher and new-plugin.mjs
 .github/workflows/catalog.yml       checks + Pages deploy
+.github/workflows/auto-merge.yml    merges new Experimental skills with no code once checks pass
 ```
 
 Catalog metadata lives in `catalog.yaml`, not in `SKILL.md` frontmatter, so `claude plugin validate --strict` stays clean.
@@ -55,7 +56,7 @@ Catalog metadata lives in `catalog.yaml`, not in `SKILL.md` frontmatter, so `cla
 
    The web publisher runs the same checks as the CLI in the browser and opens the PR through the GitHub API with a fine-grained token you paste (kept only in that tab; needs Contents and Pull requests read/write on this repo).
 2. **Checks.** The Action runs on the PR: `claude plugin validate --strict`, catalog checks (every plugin has `catalog.yaml` with owner, tier, jobs and works_with from the allowed lists; names match the marketplace entry; no unlisted folders; new plugins start as Experimental), a gitleaks secret scan, and a test build of `catalog.json`.
-3. **Merge.** A reviewer reads the skill and merges.
+3. **Merge.** After the checks pass, `.github/workflows/auto-merge.yml` squash-merges the PR without a person if it only adds one new Experimental plugin (its folder plus one `marketplace.json` entry) and bundles no code ("Instructions only" or "Pre-approved tools"). Anything else, such as skills with scripts, hooks or MCP servers, edits to existing skills, or changes outside `plugins/`, waits for a reviewer. Add the `hold` label to a PR to keep it open. The rules are in `scripts/auto-merge-check.mjs`; dry-run them with `node scripts/auto-merge-check.mjs --repo <owner/name> --pr <n>`.
 4. **Catalog updates.** On `main`, the same Action regenerates `catalog.json` (including each plugin's last commit date) and redeploys the page. Users get the new plugin with `claude plugin marketplace update skills-catalog`.
 
 Prefer to do it by hand? See [Publishing a skill manually](docs/publishing-manually.md).
