@@ -69,6 +69,11 @@
       "name": "meeting-agenda-builder",
       "source": "./plugins/meeting-agenda-builder",
       "description": "Turns a meeting goal, length and attendees into a timed agenda with a clear outcome for each item. Use when someone asks for a meeting agenda, wants to plan a workshop or kickoff, or says \"help me run this meeting\"."
+    },
+    {
+      "name": "risk-register-builder",
+      "source": "./plugins/risk-register-builder",
+      "description": "Turns a project description or a list of worries into a scored risk register with an owner and a next action for each risk. Use when someone asks for a risk register, a risk assessment, \"what could go wrong\", or wants to prepare risks for a planning or steering meeting."
     }
   ]
 }
