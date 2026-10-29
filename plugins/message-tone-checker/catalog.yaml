@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: []
+jobs: [ship, meetings]
+works_with: [chat]
+use_it_when: "Sending email"
