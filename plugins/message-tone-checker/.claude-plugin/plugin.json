@@ -1,0 +1,10 @@
+{
+  "name": "message-tone-checker",
+  "version": "0.1.0",
+  "description": "Check a draft email or chat message for tone, clarity and length before sending, and suggest a tighter rewrite. Use when someone asks \"how does this sound\", \"is this too harsh\", or wants a message reviewed before they send it.",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": []
+}
