@@ -36,6 +36,11 @@
       "description": "Turn meeting notes into decisions, owners and dates"
     },
     {
+      "name": "message-tone-checker",
+      "source": "./plugins/message-tone-checker",
+      "description": "Check a draft email or chat message for tone, clarity and length before sending, and suggest a tighter rewrite. Use when someone asks \"how does this sound\", \"is this too harsh\", or wants a message reviewed before they send it."
+    },
+    {
       "name": "metrics-review",
       "source": "./plugins/metrics-review",
       "description": "Review a product metric and pair it with guardrail metrics"
