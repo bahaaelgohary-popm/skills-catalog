@@ -6,6 +6,11 @@
   },
   "plugins": [
     {
+      "name": "acceptance-criteria-writer",
+      "source": "./plugins/acceptance-criteria-writer",
+      "description": "Turn a feature or user story description into clear, testable acceptance criteria in Given/When/Then form, including edge cases and what is out of scope. Use when someone asks for acceptance criteria, a definition of done for a story, or \"how will we know this works\"."
+    },
+    {
       "name": "changelog-from-commits",
       "source": "./plugins/changelog-from-commits",
       "description": "Write a user-facing changelog from git commits"
