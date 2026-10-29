@@ -1,0 +1,10 @@
+{
+  "name": "acceptance-criteria-writer",
+  "version": "0.1.0",
+  "description": "Turn a feature or user story description into clear, testable acceptance criteria in Given/When/Then form, including edge cases and what is out of scope. Use when someone asks for acceptance criteria, a definition of done for a story, or \"how will we know this works\".",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": []
+}
