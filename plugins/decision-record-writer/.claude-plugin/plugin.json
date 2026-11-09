@@ -1,0 +1,10 @@
+{
+  "name": "decision-record-writer",
+  "version": "0.1.0",
+  "description": "Write an architecture decision record (ADR) from a discussion or a proposal, with context, options, decision and consequences, numbered and saved next to the team's existing ADRs. Use when a technical decision has been made or needs to be written down.",
+  "author": {
+    "name": "Bahaa"
+  },
+  "license": "MIT",
+  "keywords": []
+}

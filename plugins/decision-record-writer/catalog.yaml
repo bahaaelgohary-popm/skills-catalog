@@ -1,0 +1,6 @@
+owner: "Bahaa"
+tier: Experimental
+tags: []
+jobs: [plan, ship, meetings]
+works_with: [chat, files]
+use_it_when: "Writing ADR"
