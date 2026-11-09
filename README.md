@@ -25,6 +25,8 @@ claude plugin install prd-writer@skills-catalog
 
 Browse everything, with tiers and files, on the catalog page.
 
+**Other agents (Kilo Code).** Every build also publishes all skills as an Agent Skills index at `https://bahaaelgohary-popm.github.io/skills-catalog/skills/index.json`. In Kilo Code, add `https://bahaaelgohary-popm.github.io/skills-catalog/skills/` under Settings → Agent Behaviour → Skills → Skill URLs, then reload.
+
 **Tiers.** Every new skill starts as **Experimental**. A reviewer promotes it to **Recommended** in a later PR.
 
 **What it can do.** Each skill is labelled from its files at build time: *Instructions only* (Markdown, no bundled code), *Pre-approved tools* (`allowed-tools` in a SKILL.md), or *Runs code* (scripts, hooks, MCP or language servers, `bin/`). The skill page lists exactly what was found.
