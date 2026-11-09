@@ -2,7 +2,8 @@
 // plus files/<plugin>.json with each plugin's file tree and text contents for the viewer.
 // Each plugin also gets its capabilities ("What it can do") and recent commit history.
 // Usage: node scripts/build-catalog.mjs [outDir]   (default: _site)
-import { mkdirSync, writeFileSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { mkdirSync, writeFileSync, readdirSync, readFileSync, statSync, copyFileSync } from 'node:fs';
+import { dirname } from 'node:path';
 import { execFileSync } from 'node:child_process';
 import { ROOT, MARKETPLACE, JOBS, WORKS_WITH, readJson, readYaml, pluginDir, join } from './lib.mjs';
 import { capabilities } from './capabilities.mjs';
@@ -110,6 +111,32 @@ const plugins = market.plugins.map(entry => {
   };
 });
 
+// Agent Skills index (Kilo Code: Settings > Skills > Skill URLs): every skill folder of every
+// non-deprecated plugin, served as {base}/skills/<skill>/<file>. version = plugin version, so
+// clients refresh their cache when a skill is republished.
+const skillsOut = join(outDir, 'skills');
+const skillIndex = [];
+const seenSkills = new Set();
+for (const [i, entry] of market.plugins.entries()) {
+  if (plugins[i].deprecated) continue;
+  const skillsDir = join(pluginDir(entry), 'skills');
+  let names = [];
+  try { names = readdirSync(skillsDir, { withFileTypes: true }).filter(d => d.isDirectory()).map(d => d.name).sort(); } catch { continue; }
+  for (const skill of names) {
+    const skillDir = join(skillsDir, skill);
+    const rels = listFiles(skillDir);
+    if (!rels.includes('SKILL.md') || seenSkills.has(skill)) continue;
+    seenSkills.add(skill);
+    for (const rel of rels) {
+      mkdirSync(dirname(join(skillsOut, skill, rel)), { recursive: true });
+      copyFileSync(join(skillDir, rel), join(skillsOut, skill, rel));
+    }
+    skillIndex.push({ name: skill, version: plugins[i].version || '0', files: rels });
+  }
+}
+mkdirSync(skillsOut, { recursive: true });
+writeFileSync(join(skillsOut, 'index.json'), JSON.stringify({ skills: skillIndex }, null, 2) + '\n');
+
 const catalog = {
   marketplace: market.name,
   description: market.description || '',
@@ -124,4 +151,4 @@ const catalog = {
 };
 
 writeFileSync(join(outDir, 'catalog.json'), JSON.stringify(catalog, null, 2) + '\n');
-console.log(`✔ Wrote ${join(outDir, 'catalog.json')} and files/ for ${plugins.length} plugins`);
+console.log(`✔ Wrote ${join(outDir, 'catalog.json')} and files/ for ${plugins.length} plugins, plus skills/index.json with ${skillIndex.length} skills`);
