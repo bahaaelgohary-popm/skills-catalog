@@ -27,6 +27,8 @@ Browse everything, with tiers and files, on the catalog page.
 
 **Other agents (Kilo Code).** Every build also publishes all skills as an Agent Skills index at `https://bahaaelgohary-popm.github.io/skills-catalog/skills/index.json`. In Kilo Code, add `https://bahaaelgohary-popm.github.io/skills-catalog/skills/` under Settings → Agent Behaviour → Skills → Skill URLs, then reload.
 
+**From a clone (Kilo Code, GitHub Copilot, Claude Code).** `node scripts/install-skills.mjs --for kilo` copies every skill into `~/.kilo/skills`; use `--for copilot --project <dir>` for a project's `.github/skills`, `--for claude`, or `--for agents` (`.agents/skills`, read by Kilo Code and Copilot). Re-run it after `git pull`; `--remove` takes them out again.
+
 **Tiers.** Every new skill starts as **Experimental**. A reviewer promotes it to **Recommended** in a later PR.
 
 **What it can do.** Each skill is labelled from its files at build time: *Instructions only* (Markdown, no bundled code), *Pre-approved tools* (`allowed-tools` in a SKILL.md), or *Runs code* (scripts, hooks, MCP or language servers, `bin/`). The skill page lists exactly what was found.
@@ -41,7 +43,7 @@ plugins/<name>/
   .claude-plugin/plugin.json        plugin manifest (name must match the entry)
   skills/<name>/SKILL.md            the skill itself
   catalog.yaml                      catalog-only metadata: owner, tier, tags, jobs, works_with, use_it_when
-scripts/                            check-catalog, build-catalog, new-plugin (plain Node, no deps)
+scripts/                            check-catalog, build-catalog, new-plugin, install-skills (plain Node, no deps)
 tests/                              node:test unit tests for the publisher, auto-merge rules and versions
 docs/                               publishing guide and roadmap
 site/index.html                     the marketplace: search, "I want to…", shelves, In review, Browse all with filters
